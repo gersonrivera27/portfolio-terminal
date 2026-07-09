@@ -1,12 +1,17 @@
 # Sobre mí
 
-Hola, soy Gerson Rivera.
+Hola, soy Gerson Hernandez Rivera, Cyber Security & Software Engineer (Junior).
 
-[EDITA ESTE ARCHIVO con tu propia historia: quién eres,
-qué te apasiona de la tecnología, qué estás aprendiendo,
-y qué tipo de proyectos u oportunidades buscas.]
+Soy un ingeniero de sistemas y redes que se enamoró de la ciberseguridad y 
+decidió demostrarlo construyendo, no solo estudiando. Mantengo un honeypot 
+en vivo expuesto a internet, llevé una plataforma full-stack a producción, 
+y mantengo laboratorios prácticos en segmentación de red y forense.
 
-Este mismo portafolio es uno de mis proyectos: una web
-servida desde una Raspberry Pi con Docker, Node.js y
-Cloudflare Tunnel, donde cada visitante recibe su propia
-terminal aislada.
+Aprendo más rápido poniendo las manos en sistemas reales y uso IA en mi
+flujo de trabajo diario para automatizar lo repetitivo. Más allá de lo 
+técnico, entreno e integro a nuevos miembros de equipo semanalmente bajo presión.
+
+Soy curioso, confiable y termino lo que empiezo, incluso a las 2 a.m.
+
+Actualmente busco mi primer rol en seguridad o ingeniería en un equipo
+donde pueda seguir aprendiendo y tomar responsabilidad real.

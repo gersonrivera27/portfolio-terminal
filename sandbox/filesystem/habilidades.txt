@@ -1,17 +1,29 @@
 # Habilidades
 
-[EDITA con tus habilidades reales. Ejemplo:]
+Seguridad y SOC:
+  - Detección de amenazas, triaje de alertas
+  - Respuesta a incidentes, MITRE ATT&CK
 
-Sistemas y hardware:
-  - Linux (Raspberry Pi OS, Debian)
-  - Docker y contenedores
-  - Redes básicas, Cloudflare Tunnel
+Monitoreo y SIEM:
+  - Grafana, Loki
+  - Análisis de logs, OSINT
 
 Desarrollo:
-  - JavaScript / Node.js
-  - HTML / CSS
-  - Bash scripting
+  - Python (FastAPI), JavaScript
+  - C# / .NET 8, SQL
 
-En progreso:
-  - Python
-  - Ciberseguridad
+Redes:
+  - TCP/IP, VLANs
+  - Firewalls (pfSense, FortiGate), IDS/IPS (CCNA)
+
+Infraestructura:
+  - Linux, Docker, Nginx
+  - RabbitMQ, Git, GitHub Actions
+
+IA en el flujo de trabajo:
+  - Herramientas LLM agénticas para automatización y análisis
+
+Soft skills:
+  - Entrenamiento y coaching, comunicación
+  - Trabajo en equipo, resolución de problemas
+  - Adaptabilidad, calma bajo presión

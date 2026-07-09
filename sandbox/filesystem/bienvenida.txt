@@ -1,9 +1,10 @@
-╔══════════════════════════════════════════════════╗
-║   Bienvenido al portafolio de Gerson Rivera 👋   ║
-╚══════════════════════════════════════════════════╝
+╔═════════════════════════════════════════════════════╗
+║   Bienvenido al portafolio de Gerson Hernandez R.   ║
+╚═════════════════════════════════════════════════════╝
 
-Estás en una terminal REAL corriendo en mi Raspberry Pi
-(dentro de un sandbox seguro, así que explora con confianza).
+Estás en una terminal REAL corriendo en mi entorno de
+laboratorio. Este es un entorno sandbox aislado, así que 
+explora con confianza.
 
 Comandos útiles:
   ls              → ver archivos
@@ -11,4 +12,4 @@ Comandos útiles:
   cd proyectos    → entrar a mis proyectos
   tree            → ver toda la estructura
 
-Empieza con:  cat sobre-mi.txt
+Empieza con:  cat sobre-mi.txt o cd proyectos
