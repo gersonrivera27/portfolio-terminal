@@ -23,6 +23,12 @@ Visitante ──HTTPS──> Cloudflare Tunnel ──> Raspberry Pi
 4. **Límites de recursos**: RAM, CPU y número de procesos acotados (evita fork bombs).
 5. **Timeout**: cada sesión muere a los 10 minutos; máximo 5 sesiones simultáneas y 2 por IP.
 6. **Cloudflare delante**: tu IP queda oculta, sin puertos abiertos en tu router, y puedes activar rate limiting/WAF gratis.
+7. **Headers de proxy solo confiables desde localhost**: `cf-connecting-ip` / `x-forwarded-for` solo se aceptan si la conexión viene del tunnel (loopback); si alguien llega directo al puerto 3000 no puede falsificar su IP para saltarse el límite por IP.
+8. **Sin contenedores huérfanos**: los sandboxes van etiquetados; al arrancar el servidor limpia los que quedaron de un crash, y en `SIGTERM`/`SIGINT` mata los activos antes de salir.
+
+## Log de sesiones (honeypot-style)
+
+Cada sesión y cada comando ejecutado por un visitante se registra en `server/logs/sessions.jsonl` como JSON por línea (`ts`, `event`, `ip`, `session`, `cmd`), filtrando las secuencias de escape del teclado (flechas, etc.). El formato es directamente ingerible con Promtail/Loki, así que puedes sumarlo como fuente en tu stack de Grafana igual que el honeypot Cowrie.
 
 ## Estructura del proyecto
 
@@ -31,9 +37,11 @@ portfolio-terminal/
 ├── README.md              ← esta guía
 ├── server/
 │   ├── server.js          ← backend Node.js
-│   └── package.json
+│   ├── package.json
+│   └── logs/              ← sessions.jsonl (generado, no se versiona)
 ├── public/
-│   └── index.html         ← portafolio + terminal (xterm.js)
+│   ├── index.html         ← portafolio + terminal
+│   └── vendor/            ← xterm.js auto-hospedado (sin depender de CDN)
 └── sandbox/
     ├── Dockerfile         ← imagen del sandbox
     └── filesystem/        ← lo que verá el visitante (edítalo con TU contenido)
@@ -42,8 +50,10 @@ portfolio-terminal/
         ├── habilidades.txt
         ├── contacto.txt
         └── proyectos/
-            ├── proyecto-1/README.md
-            └── proyecto-2/README.md
+            ├── honeypot-soc/README.txt
+            ├── stackpos/README.txt
+            ├── network-segmentation/README.txt
+            └── network-forensics/README.txt
 ```
 
 ## Instalación en la Raspberry Pi

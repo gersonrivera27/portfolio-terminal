@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gerson Rivera — Portafolio</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.min.css">
+<meta name="description" content="Portafolio de Gerson Hernandez Rivera, Cyber Security & Software Engineer. Una terminal real en una Raspberry Pi, enjaulada en Docker.">
+<link rel="stylesheet" href="vendor/xterm.min.css">
 <style>
   :root {
     --bg: #0d1117;
@@ -42,7 +43,13 @@
     border-radius: 6px; padding: .9rem 1.1rem; margin: 1.5rem 0;
     color: var(--muted); font-size: .9rem; line-height: 1.7;
   }
-  .hint code { color: var(--accent); background: #1f2630; padding: .1em .4em; border-radius: 4px; }
+  .hint code {
+    color: var(--accent); background: #1f2630; padding: .1em .4em;
+    border-radius: 4px; cursor: pointer; user-select: none;
+    transition: background .15s;
+  }
+  .hint code:hover { background: #2d4f3f; }
+  .hint .tip { display: block; margin-top: .3rem; font-size: .8rem; }
 
   .term-window {
     border: 1px solid var(--border); border-radius: 10px;
@@ -57,11 +64,28 @@
   .dot { width: 12px; height: 12px; border-radius: 50%; }
   .dot.r { background: #ff5f57; } .dot.y { background: #febc2e; } .dot.g { background: #28c840; }
   .term-title { color: var(--muted); font-size: .8rem; margin-left: .5rem; }
+  .term-timer { color: var(--muted); font-size: .8rem; margin-left: auto; font-variant-numeric: tabular-nums; }
   #terminal { padding: .6rem; height: 440px; }
+  @media (max-width: 600px) {
+    #terminal { height: 320px; }
+    header { padding: 1.5rem 0 1rem; }
+    h1 { font-size: 1.7rem; }
+  }
 
-  .status { margin-top: .6rem; font-size: .8rem; color: var(--muted); }
+  .status-row {
+    display: flex; align-items: center; gap: 1rem;
+    margin-top: .6rem; font-size: .8rem; color: var(--muted);
+  }
   .status .ok { color: var(--accent); }
   .status .err { color: #ff5f57; }
+  #reconnect {
+    display: none;
+    background: transparent; color: var(--accent);
+    border: 1px solid var(--accent); border-radius: 6px;
+    padding: .35rem .9rem; font: inherit; cursor: pointer;
+    transition: background .15s;
+  }
+  #reconnect:hover { background: #1f2630; }
 
   footer { margin-top: 3rem; color: var(--muted); font-size: .85rem; line-height: 1.8; }
   footer a { color: var(--accent); text-decoration: none; }
@@ -81,30 +105,54 @@
   </header>
 
   <div class="hint">
-    Prueba: <code>ls</code> para listar, <code>cat bienvenida.txt</code> para leer,
-    <code>cd proyectos</code> para entrar a una carpeta, <code>tree</code> para ver todo.
+    Prueba: <code data-cmd="ls">ls</code> para listar,
+    <code data-cmd="cat bienvenida.txt">cat bienvenida.txt</code> para leer,
+    <code data-cmd="cd proyectos">cd proyectos</code> para entrar a una carpeta,
+    <code data-cmd="tree">tree</code> para ver todo.
     La sesión dura 10 minutos. Rompe lo que quieras: el sandbox se autodestruye. 😉
+    <span class="tip">💡 Haz clic en cualquier comando para ejecutarlo directamente.</span>
   </div>
 
   <div class="term-window">
     <div class="term-bar">
       <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
       <span class="term-title">visitante@raspberry-pi: ~</span>
+      <span class="term-timer" id="timer"></span>
     </div>
     <div id="terminal"></div>
   </div>
-  <div class="status" id="status">Conectando…</div>
+  <div class="status-row">
+    <span class="status" id="status">Conectando…</span>
+    <button id="reconnect">↻ Nueva sesión</button>
+  </div>
+
+  <noscript>
+    <p style="margin-top:1.5rem; line-height:1.7;">
+      Este portafolio necesita JavaScript para la terminal interactiva.
+      Soy Gerson Hernandez Rivera, Cyber Security &amp; Software Engineer (Junior),
+      en Drogheda, Irlanda (Dublin / Remoto). Mantengo un honeypot en vivo con
+      SOC lab (Cowrie, Grafana, Loki, MITRE ATT&amp;CK), llevé una plataforma
+      full-stack a producción y mantengo laboratorios de segmentación de red y forense.
+      Contacto: gersonrivera02@icloud.com
+    </p>
+  </noscript>
 
   <footer>
-    <div>📫 Contacto: <a href="mailto:anubis1238@gmail.com">anubis1238@gmail.com</a></div>
+    <div>📫 Contacto: <a href="mailto:gersonrivera02@icloud.com">gersonrivera02@icloud.com</a></div>
+    <div>🔗 <a href="https://github.com/gersonrivera27" target="_blank" rel="noopener">GitHub</a> ·
+      <a href="https://linkedin.com/in/gersonhernandezz" target="_blank" rel="noopener">LinkedIn</a></div>
     <div>⚙️ Hecho con una Raspberry Pi, Docker, Node.js, xterm.js y Cloudflare Tunnel.</div>
   </footer>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.8.0/lib/xterm-addon-fit.min.js"></script>
+<script src="vendor/xterm.min.js"></script>
+<script src="vendor/xterm-addon-fit.min.js"></script>
 <script>
+  const SESSION_MS = 10 * 60 * 1000;
   const statusEl = document.getElementById('status');
+  const timerEl = document.getElementById('timer');
+  const reconnectBtn = document.getElementById('reconnect');
+
   const term = new Terminal({
     cursorBlink: true,
     fontSize: 14,
@@ -121,31 +169,82 @@
   term.open(document.getElementById('terminal'));
   fitAddon.fit();
 
-  const proto = location.protocol === 'https:' ? 'wss' : 'ws';
-  const ws = new WebSocket(`${proto}://${location.host}/terminal`);
+  let ws = null;
+  let timerInterval = null;
 
-  ws.onopen = () => {
-    statusEl.innerHTML = '<span class="ok">● Conectado</span> — sesión aislada iniciada';
-    ws.send(JSON.stringify({ type: 'resize', cols: term.cols, rows: term.rows }));
-  };
-  ws.onmessage = (e) => term.write(e.data);
-  ws.onclose = () => {
-    statusEl.innerHTML = '<span class="err">● Desconectado</span> — recarga la página para una nueva sesión';
-  };
-  ws.onerror = () => {
-    statusEl.innerHTML = '<span class="err">● Error de conexión</span>';
-  };
+  function startTimer() {
+    const end = Date.now() + SESSION_MS;
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+      const left = Math.max(0, end - Date.now());
+      const m = Math.floor(left / 60000);
+      const s = Math.floor((left % 60000) / 1000);
+      timerEl.textContent = `⏱ ${m}:${String(s).padStart(2, '0')}`;
+      if (left <= 0) clearInterval(timerInterval);
+    }, 1000);
+  }
+
+  function stopTimer() {
+    clearInterval(timerInterval);
+    timerEl.textContent = '';
+  }
+
+  function sendResize() {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ type: 'resize', cols: term.cols, rows: term.rows }));
+    }
+  }
+
+  function connect() {
+    const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+    ws = new WebSocket(`${proto}://${location.host}/terminal`);
+
+    ws.onopen = () => {
+      statusEl.innerHTML = '<span class="ok">● Conectado</span> — sesión aislada iniciada';
+      reconnectBtn.style.display = 'none';
+      startTimer();
+      sendResize();
+      term.focus();
+    };
+    ws.onmessage = (e) => term.write(e.data);
+    ws.onclose = () => {
+      statusEl.innerHTML = '<span class="err">● Desconectado</span>';
+      reconnectBtn.style.display = 'inline-block';
+      stopTimer();
+    };
+    ws.onerror = () => {
+      statusEl.innerHTML = '<span class="err">● Error de conexión</span>';
+      reconnectBtn.style.display = 'inline-block';
+      stopTimer();
+    };
+  }
 
   term.onData((data) => {
-    if (ws.readyState === WebSocket.OPEN) ws.send(data);
+    if (ws && ws.readyState === WebSocket.OPEN) ws.send(data);
+  });
+
+  reconnectBtn.addEventListener('click', () => {
+    term.reset();
+    statusEl.textContent = 'Conectando…';
+    connect();
+  });
+
+  // Comandos clicables del hint: se escriben y ejecutan en la terminal
+  document.querySelectorAll('.hint code[data-cmd]').forEach((el) => {
+    el.addEventListener('click', () => {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(el.dataset.cmd + '\r');
+        term.focus();
+      }
+    });
   });
 
   window.addEventListener('resize', () => {
     fitAddon.fit();
-    if (ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify({ type: 'resize', cols: term.cols, rows: term.rows }));
-    }
+    sendResize();
   });
+
+  connect();
 </script>
 </body>
 </html>
