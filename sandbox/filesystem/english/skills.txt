@@ -1,0 +1,29 @@
+# Skills
+
+Security & SOC:
+  - Threat detection, alert triage
+  - Incident response, MITRE ATT&CK
+
+Monitoring & SIEM:
+  - Grafana, Loki
+  - Log analysis, OSINT
+
+Development:
+  - Python (FastAPI), JavaScript
+  - C# / .NET 8, SQL
+
+Networking:
+  - TCP/IP, VLANs
+  - Firewalls (pfSense, FortiGate), IDS/IPS (CCNA)
+
+Infrastructure:
+  - Linux, Docker, Nginx
+  - RabbitMQ, Git, GitHub Actions
+
+AI in the workflow:
+  - Agentic LLM tools for automation and analysis
+
+Soft skills:
+  - Training and coaching, communication
+  - Teamwork, problem solving
+  - Adaptability, calm under pressure

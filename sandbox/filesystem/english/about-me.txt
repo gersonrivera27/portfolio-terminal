@@ -1,0 +1,17 @@
+# About me
+
+Hi, I'm Gerson Hernandez Rivera, Cyber Security & Software Engineer (Junior).
+
+I'm a systems and networks engineer who fell in love with cybersecurity
+and decided to prove it by building, not just studying. I run a live
+honeypot exposed to the internet, took a full-stack platform to
+production, and maintain hands-on labs in network segmentation and forensics.
+
+I learn fastest by getting my hands on real systems, and I use AI in my
+daily workflow to automate the repetitive parts. Beyond the technical
+side, I train and onboard new team members weekly under pressure.
+
+I'm curious, reliable, and I finish what I start — even at 2 a.m.
+
+I'm currently looking for my first security or engineering role on a
+team where I can keep learning and take on real responsibility.

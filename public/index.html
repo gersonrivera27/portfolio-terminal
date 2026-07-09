@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0d1117">
 <title>Gerson Rivera — Portafolio</title>
 <meta name="description" id="meta-desc" content="Portafolio de Gerson Hernandez Rivera, Cyber Security & Software Engineer. Una terminal real en una Raspberry Pi, enjaulada en Docker.">
 <meta property="og:title" content="Gerson Rivera — Portfolio">
@@ -14,26 +15,49 @@
   :root {
     --bg: #0d1117;
     --panel: #161b22;
+    --panel-2: #1a2129;
     --border: #30363d;
     --text: #e6edf3;
     --muted: #8b949e;
     --accent: #58e6a8;
+    --accent-dim: rgba(88, 230, 168, .35);
+    --danger: #ff5f57;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
   body {
-    background: var(--bg);
+    background:
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(88, 230, 168, .07), transparent),
+      var(--bg);
     color: var(--text);
     font-family: "SF Mono", "Fira Code", Menlo, Consolas, monospace;
     min-height: 100vh;
   }
-  .container { max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
-
-  .topbar {
-    display: flex; justify-content: flex-end; align-items: center;
-    padding-top: .5rem;
+  /* Rejilla de fondo sutil, estilo blueprint */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: -1;
+    background:
+      linear-gradient(rgba(88, 230, 168, .025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(88, 230, 168, .025) 1px, transparent 1px);
+    background-size: 34px 34px;
+    mask-image: linear-gradient(to bottom, rgba(0,0,0,.9), transparent 70%);
+    -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,.9), transparent 70%);
   }
+  .container { max-width: 960px; margin: 0 auto; padding: 1.25rem 1.25rem 4rem; }
+
+  /* ---- barra superior ---- */
+  .topbar {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 1rem; padding: .4rem 0;
+  }
+  .sys {
+    color: var(--muted); font-size: .75rem; letter-spacing: .05em;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .sys .on { color: var(--accent); animation: pulse 2.2s ease-in-out infinite; }
   .lang-switch {
-    display: flex; gap: .25rem;
+    display: flex; gap: .25rem; flex-shrink: 0;
     background: var(--panel); border: 1px solid var(--border);
     border-radius: 8px; padding: .25rem;
   }
@@ -46,77 +70,136 @@
   .lang-switch button:hover { color: var(--text); }
   .lang-switch button.active { background: #1f2630; color: var(--accent); }
 
-  header { padding: 2rem 0 2rem; }
+  /* ---- header ---- */
+  header { padding: 2.2rem 0 1.2rem; }
   .prompt-line { color: var(--muted); font-size: .9rem; margin-bottom: .5rem; }
-  .prompt-line .dollar { color: var(--accent); }
-  h1 { font-size: 2.2rem; letter-spacing: -.02em; }
+  .prompt-line .dollar, .typed .dollar { color: var(--accent); }
+  h1 {
+    font-size: clamp(1.7rem, 5.5vw, 2.4rem); letter-spacing: -.02em;
+    color: var(--accent);
+    text-shadow: 0 0 22px var(--accent-dim);
+  }
   h1 .cursor {
-    display: inline-block; width: .6em; height: 1.1em;
+    display: inline-block; width: .55em; height: 1.05em;
     background: var(--accent); vertical-align: text-bottom;
+    box-shadow: 0 0 10px var(--accent-dim);
     animation: blink 1.1s steps(1) infinite;
   }
   @keyframes blink { 50% { opacity: 0; } }
-  .subtitle { color: var(--muted); margin-top: .75rem; line-height: 1.6; }
+  @keyframes pulse { 50% { opacity: .45; } }
+  .typed { margin-top: .5rem; color: var(--text); font-size: .95rem; min-height: 1.4em; }
+  .typed .tcursor { color: var(--accent); animation: blink 1s steps(1) infinite; }
+  .subtitle { color: var(--muted); margin-top: .8rem; line-height: 1.65; font-size: .92rem; max-width: 46rem; }
   .subtitle strong { color: var(--accent); font-weight: 600; }
 
-  .hint {
-    background: var(--panel); border: 1px solid var(--border);
-    border-left: 3px solid var(--accent);
-    border-radius: 6px; padding: .9rem 1.1rem; margin: 1.5rem 0;
-    color: var(--muted); font-size: .9rem; line-height: 1.7;
+  /* ---- badges de seguridad ---- */
+  .badges { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1.1rem 0 0; }
+  .badge {
+    display: inline-flex; align-items: center; gap: .4em;
+    border: 1px solid var(--border); border-radius: 999px;
+    background: var(--panel); color: var(--muted);
+    font-size: .72rem; padding: .32em .8em; letter-spacing: .02em;
+    white-space: nowrap;
   }
-  .hint code {
-    color: var(--accent); background: #1f2630; padding: .1em .4em;
-    border-radius: 4px; cursor: pointer; user-select: none;
-    transition: background .15s;
-  }
-  .hint code:hover { background: #2d4f3f; }
-  .hint .tip { display: block; margin-top: .3rem; font-size: .8rem; }
+  .badge::before { content: '✓'; color: var(--accent); font-weight: 700; }
 
+  /* ---- comandos listos ---- */
+  .sec-label {
+    color: var(--muted); font-size: .8rem; letter-spacing: .06em;
+    margin: 1.6rem 0 .7rem;
+  }
+  .sec-label .hash { color: var(--accent); }
+  .cmd-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: .6rem;
+  }
+  .cmd-btn {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 8px; padding: .65rem .8rem;
+    font: inherit; text-align: left; cursor: pointer;
+    transition: border-color .15s, background .15s, transform .15s, box-shadow .15s;
+  }
+  .cmd-btn:hover, .cmd-btn:focus-visible {
+    border-color: var(--accent); background: var(--panel-2);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, .35), 0 0 0 1px var(--accent-dim);
+    outline: none;
+  }
+  .cmd-btn:active { transform: translateY(0); }
+  .cmd-btn .c { display: block; color: var(--accent); font-weight: 600; font-size: .85rem; }
+  .cmd-btn .c::before { content: '$ '; color: var(--muted); font-weight: 400; }
+  .cmd-btn .d { display: block; color: var(--muted); font-size: .72rem; margin-top: .25rem; }
+  .note { color: var(--muted); font-size: .78rem; margin: .7rem 0 1.2rem; line-height: 1.6; }
+
+  /* ---- terminal ---- */
   .term-window {
+    position: relative;
     border: 1px solid var(--border); border-radius: 10px;
     overflow: hidden; background: #0a0e14;
-    box-shadow: 0 12px 40px rgba(0,0,0,.5);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, .5), 0 0 60px rgba(88, 230, 168, .05);
+  }
+  /* scanlines sutiles tipo CRT */
+  .term-window::after {
+    content: ''; position: absolute; inset: 0; z-index: 5; pointer-events: none;
+    background: repeating-linear-gradient(0deg, rgba(255, 255, 255, .014) 0 1px, transparent 1px 3px);
   }
   .term-bar {
     display: flex; align-items: center; gap: .5rem;
     background: var(--panel); padding: .6rem .9rem;
     border-bottom: 1px solid var(--border);
   }
-  .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
   .dot.r { background: #ff5f57; } .dot.y { background: #febc2e; } .dot.g { background: #28c840; }
-  .term-title { color: var(--muted); font-size: .8rem; margin-left: .5rem; }
-  .term-timer { color: var(--muted); font-size: .8rem; margin-left: auto; font-variant-numeric: tabular-nums; }
-  #terminal { padding: .6rem; height: 440px; }
-  @media (max-width: 600px) {
-    #terminal { height: 320px; }
-    header { padding: 1rem 0 1rem; }
-    h1 { font-size: 1.7rem; }
+  .term-title {
+    color: var(--muted); font-size: .8rem; margin-left: .5rem;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
+  .term-timer { color: var(--muted); font-size: .8rem; margin-left: auto; font-variant-numeric: tabular-nums; flex-shrink: 0; }
+  #terminal { padding: .6rem; height: clamp(300px, 52vh, 440px); }
 
   .status-row {
-    display: flex; align-items: center; gap: 1rem;
+    display: flex; align-items: center; flex-wrap: wrap; gap: .8rem;
     margin-top: .6rem; font-size: .8rem; color: var(--muted);
   }
-  .status .ok { color: var(--accent); }
-  .status .err { color: #ff5f57; }
+  .status .ok { color: var(--accent); animation: pulse 2.2s ease-in-out infinite; }
+  .status .err { color: var(--danger); }
   #reconnect {
     display: none;
     background: transparent; color: var(--accent);
     border: 1px solid var(--accent); border-radius: 6px;
-    padding: .35rem .9rem; font: inherit; cursor: pointer;
-    transition: background .15s;
+    padding: .35rem .9rem; font: inherit; font-size: .8rem; cursor: pointer;
+    transition: background .15s, box-shadow .15s;
   }
-  #reconnect:hover { background: #1f2630; }
+  #reconnect:hover { background: #1f2630; box-shadow: 0 0 14px var(--accent-dim); }
 
-  footer { margin-top: 3rem; color: var(--muted); font-size: .85rem; line-height: 1.8; }
+  footer { margin-top: 3rem; color: var(--muted); font-size: .85rem; line-height: 1.9; }
   footer a { color: var(--accent); text-decoration: none; }
   footer a:hover { text-decoration: underline; }
+
+  /* ---- móvil ---- */
+  @media (max-width: 600px) {
+    .container { padding: .9rem .85rem 3rem; }
+    header { padding: 1.4rem 0 .8rem; }
+    .subtitle { font-size: .85rem; }
+    .badges { gap: .4rem; }
+    .badge { font-size: .68rem; }
+    .cmd-grid { grid-template-columns: repeat(2, 1fr); gap: .5rem; }
+    .cmd-btn { padding: .55rem .65rem; }
+    .cmd-btn .c { font-size: .78rem; }
+    #terminal { padding: .4rem; height: 46vh; }
+    .term-title { font-size: .72rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    h1 .cursor, .typed .tcursor, .status .ok, .sys .on { animation: none; }
+  }
 </style>
 </head>
 <body>
 <div class="container">
   <div class="topbar">
+    <span class="sys">[ <span class="on">●</span> raspberry-pi :: docker-sandbox :: online ]</span>
     <div class="lang-switch" role="group" aria-label="Idioma / Language">
       <button data-lang="es">ES</button>
       <button data-lang="en">EN</button>
@@ -127,10 +210,19 @@
   <header>
     <div class="prompt-line"><span class="dollar">$</span> whoami</div>
     <h1>Gerson Rivera<span class="cursor"></span></h1>
+    <div class="typed"><span class="dollar">&gt;</span> <span id="typed-text"></span><span class="tcursor">█</span></div>
     <p class="subtitle" data-i18n="subtitle"></p>
+    <div class="badges">
+      <span class="badge" data-i18n="badge_sandbox"></span>
+      <span class="badge" data-i18n="badge_nonet"></span>
+      <span class="badge" data-i18n="badge_ro"></span>
+      <span class="badge" data-i18n="badge_ttl"></span>
+    </div>
   </header>
 
-  <div class="hint" id="hint"></div>
+  <div class="sec-label"><span class="hash">##</span> <span data-i18n="cmd_title"></span></div>
+  <div class="cmd-grid" id="cmds" role="group" aria-label="Comandos"></div>
+  <p class="note" data-i18n="note"></p>
 
   <div class="term-window">
     <div class="term-bar">
@@ -173,8 +265,19 @@
     es: {
       title: 'Gerson Rivera — Portafolio',
       meta_desc: 'Portafolio de Gerson Hernandez Rivera, Cyber Security & Software Engineer. Una terminal real en una Raspberry Pi, enjaulada en Docker.',
-      subtitle: 'Este portafolio <strong>no es una página normal</strong>: es una terminal real corriendo en mi <strong>Raspberry Pi</strong>, en una jaula segura solo para ti. Explóralo como si fuera mi computadora.',
-      hint: 'Prueba: <code data-cmd="ls">ls</code> para listar, <code data-cmd="cat bienvenida.txt">cat bienvenida.txt</code> para leer, <code data-cmd="cd proyectos">cd proyectos</code> para entrar a una carpeta, <code data-cmd="tree">tree</code> para ver todo. La sesión dura 10 minutos. Rompe lo que quieras: el sandbox se autodestruye. 😉 <span class="tip">💡 Haz clic en cualquier comando para ejecutarlo directamente.</span>',
+      subtitle: 'Este portafolio <strong>no es una página normal</strong>: es una terminal real corriendo en mi <strong>Raspberry Pi</strong>. Cada visita levanta un contenedor Docker desechable, aislado y con límites — explóralo como si fuera mi computadora.',
+      badge_sandbox: 'sandbox Docker efímero',
+      badge_nonet: 'sin acceso a red',
+      badge_ro: 'solo lectura',
+      badge_ttl: 'autodestrucción en 10 min',
+      cmd_title: 'comandos_listos — toca uno para ejecutarlo',
+      d_ls: 'listar archivos',
+      d_about: 'quién soy',
+      d_projects: 'entrar a mis proyectos',
+      d_tree: 'ver toda la estructura',
+      d_skills: 'skills y stack',
+      d_contact: 'cómo contactarme',
+      note: 'También puedes escribir directamente en la terminal (bash real). La sesión dura 10 minutos. Rompe lo que quieras: el sandbox se autodestruye. 😉',
       status_connecting: 'Conectando…',
       status_connected: '<span class="ok">● Conectado</span> — sesión aislada iniciada',
       status_disconnected: '<span class="err">● Desconectado</span>',
@@ -186,8 +289,19 @@
     en: {
       title: 'Gerson Rivera — Portfolio',
       meta_desc: 'Portfolio of Gerson Hernandez Rivera, Cyber Security & Software Engineer. A real terminal on a Raspberry Pi, sandboxed in Docker.',
-      subtitle: 'This portfolio is <strong>not a normal webpage</strong>: it is a real terminal running on my <strong>Raspberry Pi</strong>, inside a secure sandbox just for you. Explore it as if it were my computer.',
-      hint: 'Try: <code data-cmd="ls">ls</code> to list files, <code data-cmd="cat bienvenida.txt">cat bienvenida.txt</code> to read, <code data-cmd="cd proyectos">cd proyectos</code> to enter a folder, <code data-cmd="tree">tree</code> to see everything. Sessions last 10 minutes. Break whatever you want: the sandbox self-destructs. 😉 <span class="tip">💡 Click any command to run it directly.</span>',
+      subtitle: 'This portfolio is <strong>not a normal webpage</strong>: it is a real terminal running on my <strong>Raspberry Pi</strong>. Every visit spins up a disposable, isolated Docker container with hard limits — explore it as if it were my computer.',
+      badge_sandbox: 'ephemeral Docker sandbox',
+      badge_nonet: 'no network access',
+      badge_ro: 'read-only filesystem',
+      badge_ttl: 'self-destructs in 10 min',
+      cmd_title: 'ready_to_run — tap one to execute it',
+      d_ls: 'list files',
+      d_about: 'who I am',
+      d_projects: 'browse my projects',
+      d_tree: 'see the whole structure',
+      d_skills: 'skills & stack',
+      d_contact: 'how to reach me',
+      note: 'You can also type directly in the terminal (real bash). Sessions last 10 minutes. Break whatever you want: the sandbox self-destructs. 😉',
       status_connecting: 'Connecting…',
       status_connected: '<span class="ok">● Connected</span> — isolated session started',
       status_disconnected: '<span class="err">● Disconnected</span>',
@@ -199,8 +313,19 @@
     pt: {
       title: 'Gerson Rivera — Portfólio',
       meta_desc: 'Portfólio de Gerson Hernandez Rivera, Cyber Security & Software Engineer. Um terminal real em um Raspberry Pi, isolado em Docker.',
-      subtitle: 'Este portfólio <strong>não é uma página normal</strong>: é um terminal real rodando no meu <strong>Raspberry Pi</strong>, dentro de uma jaula segura só para você. Explore como se fosse o meu computador.',
-      hint: 'Experimente: <code data-cmd="ls">ls</code> para listar, <code data-cmd="cat bienvenida.txt">cat bienvenida.txt</code> para ler, <code data-cmd="cd proyectos">cd proyectos</code> para entrar em uma pasta, <code data-cmd="tree">tree</code> para ver tudo. A sessão dura 10 minutos. Quebre o que quiser: o sandbox se autodestrói. 😉 <span class="tip">💡 Clique em qualquer comando para executá-lo diretamente.</span>',
+      subtitle: 'Este portfólio <strong>não é uma página normal</strong>: é um terminal real rodando no meu <strong>Raspberry Pi</strong>. Cada visita cria um contêiner Docker descartável, isolado e com limites — explore como se fosse o meu computador.',
+      badge_sandbox: 'sandbox Docker efêmero',
+      badge_nonet: 'sem acesso à rede',
+      badge_ro: 'somente leitura',
+      badge_ttl: 'autodestruição em 10 min',
+      cmd_title: 'comandos_prontos — toque em um para executar',
+      d_ls: 'listar arquivos',
+      d_about: 'quem eu sou',
+      d_projects: 'entrar nos meus projetos',
+      d_tree: 'ver toda a estrutura',
+      d_skills: 'skills e stack',
+      d_contact: 'como falar comigo',
+      note: 'Você também pode digitar direto no terminal (bash real). A sessão dura 10 minutos. Quebre o que quiser: o sandbox se autodestrói. 😉',
       status_connecting: 'Conectando…',
       status_connected: '<span class="ok">● Conectado</span> — sessão isolada iniciada',
       status_disconnected: '<span class="err">● Desconectado</span>',
@@ -211,10 +336,32 @@
     },
   };
 
+  // Comandos listos para usar. En EN/PT la sesión arranca en ~/english,
+  // así que los comandos apuntan a los archivos traducidos.
+  const COMMANDS = {
+    es: [
+      { cmd: 'ls', k: 'd_ls' },
+      { cmd: 'cat sobre-mi.txt', k: 'd_about' },
+      { cmd: 'cd proyectos', k: 'd_projects' },
+      { cmd: 'tree', k: 'd_tree' },
+      { cmd: 'cat habilidades.txt', k: 'd_skills' },
+      { cmd: 'cat contacto.txt', k: 'd_contact' },
+    ],
+    en: [
+      { cmd: 'ls', k: 'd_ls' },
+      { cmd: 'cat about-me.txt', k: 'd_about' },
+      { cmd: 'cd projects', k: 'd_projects' },
+      { cmd: 'tree', k: 'd_tree' },
+      { cmd: 'cat skills.txt', k: 'd_skills' },
+      { cmd: 'cat contact.txt', k: 'd_contact' },
+    ],
+  };
+  COMMANDS.pt = COMMANDS.en;
+
   const statusEl = document.getElementById('status');
   const timerEl = document.getElementById('timer');
   const reconnectBtn = document.getElementById('reconnect');
-  const hintEl = document.getElementById('hint');
+  const cmdsEl = document.getElementById('cmds');
 
   let lang = localStorage.getItem('lang');
   if (!lang || !I18N[lang]) {
@@ -230,14 +377,27 @@
     statusEl.innerHTML = t('status_' + key);
   }
 
-  function bindCmds() {
-    hintEl.querySelectorAll('code[data-cmd]').forEach((el) => {
-      el.addEventListener('click', () => {
+  function renderCmds() {
+    cmdsEl.innerHTML = '';
+    COMMANDS[lang].forEach(({ cmd, k }) => {
+      const btn = document.createElement('button');
+      btn.className = 'cmd-btn';
+      btn.type = 'button';
+      const c = document.createElement('span');
+      c.className = 'c';
+      c.textContent = cmd;
+      const d = document.createElement('span');
+      d.className = 'd';
+      d.textContent = t(k);
+      btn.append(c, d);
+      btn.addEventListener('click', () => {
         if (ws && ws.readyState === WebSocket.OPEN) {
-          ws.send(el.dataset.cmd + '\r');
+          ws.send(cmd + '\r');
           term.focus();
+          document.querySelector('.term-window').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
       });
+      cmdsEl.appendChild(btn);
     });
   }
 
@@ -250,8 +410,7 @@
     document.querySelectorAll('[data-i18n]').forEach((el) => {
       el.innerHTML = t(el.dataset.i18n);
     });
-    hintEl.innerHTML = t('hint');
-    bindCmds();
+    renderCmds();
     reconnectBtn.textContent = t('reconnect');
     setStatus(lastStatus);
     document.querySelectorAll('.lang-switch button').forEach((b) => {
@@ -263,11 +422,25 @@
     b.addEventListener('click', () => setLang(b.dataset.lang));
   });
 
+  // ---------- efecto de tipeo del rol ----------
+  const ROLE = 'Cyber Security & Software Engineer — Drogheda, IE';
+  const typedEl = document.getElementById('typed-text');
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    typedEl.textContent = ROLE;
+  } else {
+    let ti = 0;
+    (function type() {
+      typedEl.textContent = ROLE.slice(0, ti++);
+      if (ti <= ROLE.length) setTimeout(type, 35 + Math.random() * 45);
+    })();
+  }
+
   // ---------- Terminal ----------
   const SESSION_MS = 10 * 60 * 1000;
+  const isSmall = window.matchMedia('(max-width: 600px)').matches;
   const term = new Terminal({
     cursorBlink: true,
-    fontSize: 14,
+    fontSize: isSmall ? 13 : 14,
     fontFamily: '"SF Mono", "Fira Code", Menlo, Consolas, monospace',
     theme: {
       background: '#0a0e14',
@@ -309,14 +482,15 @@
 
   function connect() {
     const proto = location.protocol === 'https:' ? 'wss' : 'ws';
-    ws = new WebSocket(`${proto}://${location.host}/terminal`);
+    // El idioma elegido viaja al servidor, que se lo pasa al contenedor
+    ws = new WebSocket(`${proto}://${location.host}/terminal?lang=${lang}`);
 
     ws.onopen = () => {
       setStatus('connected');
       reconnectBtn.style.display = 'none';
       startTimer();
       sendResize();
-      term.focus();
+      if (!isSmall) term.focus(); // en móvil no abrir el teclado de golpe
     };
     ws.onmessage = (e) => term.write(e.data);
     ws.onclose = () => {
@@ -341,9 +515,13 @@
     connect();
   });
 
+  let resizeRaf = null;
   window.addEventListener('resize', () => {
-    fitAddon.fit();
-    sendResize();
+    cancelAnimationFrame(resizeRaf);
+    resizeRaf = requestAnimationFrame(() => {
+      fitAddon.fit();
+      sendResize();
+    });
   });
 
   setLang(lang);

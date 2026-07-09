@@ -76,8 +76,19 @@ function clientIp(req) {
   );
 }
 
+function visitorLang(req) {
+  // Idioma elegido en la web (?lang=xx). Validado contra lista blanca:
+  // este valor termina como variable de entorno del contenedor.
+  try {
+    const q = new URL(req.url, 'http://localhost').searchParams.get('lang');
+    if (q === 'en' || q === 'pt') return q;
+  } catch (_) {}
+  return 'es';
+}
+
 wss.on('connection', (ws, req) => {
   const ip = clientIp(req);
+  const lang = visitorLang(req);
 
   if (activeSessions >= MAX_SESSIONS) {
     ws.send('\r\n\x1b[31mServidor lleno. Intenta de nuevo en unos minutos.\x1b[0m\r\n');
@@ -95,8 +106,8 @@ wss.on('connection', (ws, req) => {
 
   const containerName = `sandbox-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
   activeContainers.add(containerName);
-  console.log(`[+] Nueva conexión desde ${ip} -> ${containerName} (Activos: ${activeSessions}/${MAX_SESSIONS})`);
-  logEvent('session_start', { ip, session: containerName });
+  console.log(`[+] Nueva conexión desde ${ip} (${lang}) -> ${containerName} (Activos: ${activeSessions}/${MAX_SESSIONS})`);
+  logEvent('session_start', { ip, session: containerName, lang });
 
   // Contenedor desechable, sin red, solo lectura, sin privilegios, con límites.
   const dockerArgs = [
@@ -113,6 +124,7 @@ wss.on('connection', (ws, req) => {
     '--security-opt', 'no-new-privileges',
     '--cap-drop', 'ALL',
     '--user', 'visitante',
+    '-e', `VISITOR_LANG=${lang}`,
     IMAGE,
   ];
 

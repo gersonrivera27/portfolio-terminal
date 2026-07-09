@@ -49,11 +49,29 @@ portfolio-terminal/
         ├── sobre-mi.txt
         ├── habilidades.txt
         ├── contacto.txt
-        └── proyectos/
-            ├── honeypot-soc/README.txt
-            ├── stackpos/README.txt
-            ├── network-segmentation/README.txt
-            └── network-forensics/README.txt
+        ├── proyectos/
+        │   ├── honeypot-soc/README.txt
+        │   ├── stackpos/README.txt
+        │   ├── network-segmentation/README.txt
+        │   └── network-forensics/README.txt
+        └── english/       ← todo el contenido traducido al inglés
+            ├── welcome.txt
+            ├── about-me.txt
+            ├── skills.txt
+            ├── contact.txt
+            └── projects/…
+
+## Sandbox bilingüe
+
+El idioma elegido en la web (ES/EN/PT) viaja por el WebSocket (`/terminal?lang=xx`),
+el servidor lo valida y lo inyecta al contenedor como `VISITOR_LANG`. El script de
+perfil de la imagen arranca la sesión en `~/english` con bienvenida en inglés para
+`en`/`pt`, y en `~` con la bienvenida en español para el resto. Tras editar el
+contenido o el Dockerfile hay que reconstruir la imagen:
+
+```bash
+cd sandbox && docker build -t portfolio-sandbox .
+```
 ```
 
 ## Instalación en la Raspberry Pi

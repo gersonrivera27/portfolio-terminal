@@ -13,3 +13,5 @@ Comandos útiles:
   tree            → ver toda la estructura
 
 Empieza con:  cat sobre-mi.txt o cd proyectos
+
+English? → cd english  (everything is translated there)

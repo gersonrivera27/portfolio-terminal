@@ -1,0 +1,17 @@
+╔═════════════════════════════════════════════════════╗
+║   Welcome to Gerson Hernandez R.'s portfolio         ║
+╚═════════════════════════════════════════════════════╝
+
+You are in a REAL terminal running in my lab
+environment. This is an isolated sandbox, so feel
+free to explore with confidence.
+
+Useful commands:
+  ls              → list files
+  cat <file>      → read a file
+  cd projects     → browse my projects
+  tree            → see the whole structure
+
+Start with:  cat about-me.txt or cd projects
+
+¿Español? → cd ~  (los archivos en español están ahí)
