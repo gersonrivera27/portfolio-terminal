@@ -63,12 +63,25 @@ function isLoopback(addr) {
   return addr === '127.0.0.1' || addr === '::1' || addr === '::ffff:127.0.0.1';
 }
 
+// Prefijos de IP adicionales desde los que se confía en los headers de proxy.
+// Útil cuando cloudflared corre en Docker y llega con IP del bridge, p. ej.:
+//   TRUSTED_PROXIES="172.17."       (bridge por defecto de Docker)
+//   TRUSTED_PROXIES="192.168.1.24"  (la propia Pi)
+const TRUSTED_PROXIES = (process.env.TRUSTED_PROXIES || '')
+  .split(',').map((s) => s.trim()).filter(Boolean);
+
+function isTrustedProxy(addr) {
+  if (isLoopback(addr)) return true;
+  const a = addr.startsWith('::ffff:') ? addr.slice(7) : addr;
+  return TRUSTED_PROXIES.some((p) => a.startsWith(p));
+}
+
 function clientIp(req) {
-  // Solo confiamos en los headers de proxy cuando la conexión viene de
-  // localhost (el Cloudflare Tunnel corre en la propia Pi). Si alguien
+  // Solo confiamos en los headers de proxy cuando la conexión viene del
+  // tunnel (loopback o un proxy listado en TRUSTED_PROXIES). Si alguien
   // llega directo al puerto 3000, esos headers son falsificables.
   const remote = req.socket.remoteAddress || 'unknown';
-  if (!isLoopback(remote)) return remote;
+  if (!isTrustedProxy(remote)) return remote;
   return (
     req.headers['cf-connecting-ip'] ||
     (req.headers['x-forwarded-for'] || '').split(',')[0].trim() ||
