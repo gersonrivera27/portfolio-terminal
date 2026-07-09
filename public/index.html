@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gerson Rivera — Portafolio</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/xterm/5.3.0/xterm.min.css">
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #58e6a8;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "SF Mono", "Fira Code", Menlo, Consolas, monospace;
+    min-height: 100vh;
+  }
+  .container { max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+
+  header { padding: 3rem 0 2rem; }
+  .prompt-line { color: var(--muted); font-size: .9rem; margin-bottom: .5rem; }
+  .prompt-line .dollar { color: var(--accent); }
+  h1 { font-size: 2.2rem; letter-spacing: -.02em; }
+  h1 .cursor {
+    display: inline-block; width: .6em; height: 1.1em;
+    background: var(--accent); vertical-align: text-bottom;
+    animation: blink 1.1s steps(1) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  .subtitle { color: var(--muted); margin-top: .75rem; line-height: 1.6; }
+  .subtitle strong { color: var(--accent); font-weight: 600; }
+
+  .hint {
+    background: var(--panel); border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px; padding: .9rem 1.1rem; margin: 1.5rem 0;
+    color: var(--muted); font-size: .9rem; line-height: 1.7;
+  }
+  .hint code { color: var(--accent); background: #1f2630; padding: .1em .4em; border-radius: 4px; }
+
+  .term-window {
+    border: 1px solid var(--border); border-radius: 10px;
+    overflow: hidden; background: #0a0e14;
+    box-shadow: 0 12px 40px rgba(0,0,0,.5);
+  }
+  .term-bar {
+    display: flex; align-items: center; gap: .5rem;
+    background: var(--panel); padding: .6rem .9rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .dot.r { background: #ff5f57; } .dot.y { background: #febc2e; } .dot.g { background: #28c840; }
+  .term-title { color: var(--muted); font-size: .8rem; margin-left: .5rem; }
+  #terminal { padding: .6rem; height: 440px; }
+
+  .status { margin-top: .6rem; font-size: .8rem; color: var(--muted); }
+  .status .ok { color: var(--accent); }
+  .status .err { color: #ff5f57; }
+
+  footer { margin-top: 3rem; color: var(--muted); font-size: .85rem; line-height: 1.8; }
+  footer a { color: var(--accent); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="prompt-line"><span class="dollar">$</span> whoami</div>
+    <h1>Gerson Rivera<span class="cursor"></span></h1>
+    <p class="subtitle">
+      Este portafolio <strong>no es una página normal</strong>: es una terminal real
+      corriendo en mi <strong>Raspberry Pi</strong>, en una jaula segura solo para ti.
+      Explóralo como si fuera mi computadora.
+    </p>
+  </header>
+
+  <div class="hint">
+    Prueba: <code>ls</code> para listar, <code>cat bienvenida.txt</code> para leer,
+    <code>cd proyectos</code> para entrar a una carpeta, <code>tree</code> para ver todo.
+    La sesión dura 10 minutos. Rompe lo que quieras: el sandbox se autodestruye. 😉
+  </div>
+
+  <div class="term-window">
+    <div class="term-bar">
+      <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+      <span class="term-title">visitante@raspberry-pi: ~</span>
+    </div>
+    <div id="terminal"></div>
+  </div>
+  <div class="status" id="status">Conectando…</div>
+
+  <footer>
+    <div>📫 Contacto: <a href="mailto:anubis1238@gmail.com">anubis1238@gmail.com</a></div>
+    <div>⚙️ Hecho con una Raspberry Pi, Docker, Node.js, xterm.js y Cloudflare Tunnel.</div>
+  </footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xterm/5.3.0/xterm.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xterm-addon-fit/0.8.0/xterm-addon-fit.min.js"></script>
+<script>
+  const statusEl = document.getElementById('status');
+  const term = new Terminal({
+    cursorBlink: true,
+    fontSize: 14,
+    fontFamily: '"SF Mono", "Fira Code", Menlo, Consolas, monospace',
+    theme: {
+      background: '#0a0e14',
+      foreground: '#e6edf3',
+      cursor: '#58e6a8',
+      selectionBackground: '#2d4f3f',
+    },
+  });
+  const fitAddon = new FitAddon.FitAddon();
+  term.loadAddon(fitAddon);
+  term.open(document.getElementById('terminal'));
+  fitAddon.fit();
+
+  const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+  const ws = new WebSocket(`${proto}://${location.host}/terminal`);
+
+  ws.onopen = () => {
+    statusEl.innerHTML = '<span class="ok">● Conectado</span> — sesión aislada iniciada';
+    ws.send(JSON.stringify({ type: 'resize', cols: term.cols, rows: term.rows }));
+  };
+  ws.onmessage = (e) => term.write(e.data);
+  ws.onclose = () => {
+    statusEl.innerHTML = '<span class="err">● Desconectado</span> — recarga la página para una nueva sesión';
+  };
+  ws.onerror = () => {
+    statusEl.innerHTML = '<span class="err">● Error de conexión</span>';
+  };
+
+  term.onData((data) => {
+    if (ws.readyState === WebSocket.OPEN) ws.send(data);
+  });
+
+  window.addEventListener('resize', () => {
+    fitAddon.fit();
+    if (ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ type: 'resize', cols: term.cols, rows: term.rows }));
+    }
+  });
+</script>
+</body>
+</html>

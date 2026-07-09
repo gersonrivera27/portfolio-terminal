@@ -1,0 +1,17 @@
+# Habilidades
+
+[EDITA con tus habilidades reales. Ejemplo:]
+
+Sistemas y hardware:
+  - Linux (Raspberry Pi OS, Debian)
+  - Docker y contenedores
+  - Redes básicas, Cloudflare Tunnel
+
+Desarrollo:
+  - JavaScript / Node.js
+  - HTML / CSS
+  - Bash scripting
+
+En progreso:
+  - Python
+  - Ciberseguridad

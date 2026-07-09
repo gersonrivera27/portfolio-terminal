@@ -1,0 +1,12 @@
+# Sobre mí
+
+Hola, soy Gerson Rivera.
+
+[EDITA ESTE ARCHIVO con tu propia historia: quién eres,
+qué te apasiona de la tecnología, qué estás aprendiendo,
+y qué tipo de proyectos u oportunidades buscas.]
+
+Este mismo portafolio es uno de mis proyectos: una web
+servida desde una Raspberry Pi con Docker, Node.js y
+Cloudflare Tunnel, donde cada visitante recibe su propia
+terminal aislada.

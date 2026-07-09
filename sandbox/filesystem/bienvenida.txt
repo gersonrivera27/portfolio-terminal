@@ -1,0 +1,14 @@
+╔══════════════════════════════════════════════════╗
+║   Bienvenido al portafolio de Gerson Rivera 👋   ║
+╚══════════════════════════════════════════════════╝
+
+Estás en una terminal REAL corriendo en mi Raspberry Pi
+(dentro de un sandbox seguro, así que explora con confianza).
+
+Comandos útiles:
+  ls              → ver archivos
+  cat <archivo>   → leer un archivo
+  cd proyectos    → entrar a mis proyectos
+  tree            → ver toda la estructura
+
+Empieza con:  cat sobre-mi.txt
