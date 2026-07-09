@@ -4,7 +4,7 @@
 const path = require('path');
 const fs = require('fs');
 const http = require('http');
-const { exec, execSync } = require('child_process');
+const { exec } = require('child_process');
 const express = require('express');
 const { WebSocketServer } = require('ws');
 const pty = require('node-pty');
@@ -28,20 +28,22 @@ function logEvent(event, fields) {
 }
 
 // ---------- Comprobaciones de arranque ----------
-try {
-  execSync(`docker image inspect ${IMAGE}`, { stdio: 'ignore' });
-} catch (_) {
-  console.error(`[!] Docker no responde o la imagen "${IMAGE}" no existe.`);
-  console.error(`[!] Construye la imagen con: cd sandbox && docker build -t ${IMAGE} .`);
-  console.error('[!] El servidor arrancará igual, pero las sesiones fallarán.');
-}
+// Asíncronas y con timeout: si el CLI de docker se cuelga (daemon caído o
+// a medio arrancar), no debe bloquear el arranque del servidor.
+exec(`docker image inspect ${IMAGE}`, { timeout: 5000 }, (err) => {
+  if (err) {
+    console.error(`[!] Docker no responde o la imagen "${IMAGE}" no existe.`);
+    console.error(`[!] Construye la imagen con: cd sandbox && docker build -t ${IMAGE} .`);
+    console.error('[!] El servidor seguirá corriendo, pero las sesiones fallarán.');
+  }
+});
 
 // Limpia contenedores huérfanos de una ejecución anterior (crash, pm2 restart...)
-exec(`docker ps -aq --filter label=${CONTAINER_LABEL}`, (err, stdout) => {
+exec(`docker ps -aq --filter label=${CONTAINER_LABEL}`, { timeout: 5000 }, (err, stdout) => {
   const ids = (stdout || '').trim();
   if (!err && ids) {
     console.log(`[*] Limpiando ${ids.split('\n').length} contenedor(es) huérfano(s)...`);
-    exec(`docker rm -f ${ids.split('\n').join(' ')}`, () => {});
+    exec(`docker rm -f ${ids.split('\n').join(' ')}`, { timeout: 10000 }, () => {});
   }
 });
 

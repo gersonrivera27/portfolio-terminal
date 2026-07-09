@@ -4,7 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gerson Rivera — Portafolio</title>
-<meta name="description" content="Portafolio de Gerson Hernandez Rivera, Cyber Security & Software Engineer. Una terminal real en una Raspberry Pi, enjaulada en Docker.">
+<meta name="description" id="meta-desc" content="Portafolio de Gerson Hernandez Rivera, Cyber Security & Software Engineer. Una terminal real en una Raspberry Pi, enjaulada en Docker.">
+<meta property="og:title" content="Gerson Rivera — Portfolio">
+<meta property="og:description" content="Not a normal webpage: a real terminal running on my Raspberry Pi, sandboxed in Docker. / Una terminal real corriendo en mi Raspberry Pi.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%230d1117'/%3E%3Ctext x='18' y='68' font-family='monospace' font-size='48' fill='%2358e6a8'%3E%26gt;_%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="vendor/xterm.min.css">
 <style>
   :root {
@@ -24,7 +28,25 @@
   }
   .container { max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
 
-  header { padding: 3rem 0 2rem; }
+  .topbar {
+    display: flex; justify-content: flex-end; align-items: center;
+    padding-top: .5rem;
+  }
+  .lang-switch {
+    display: flex; gap: .25rem;
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 8px; padding: .25rem;
+  }
+  .lang-switch button {
+    background: transparent; color: var(--muted);
+    border: none; border-radius: 5px;
+    font: inherit; font-size: .8rem; padding: .3rem .6rem;
+    cursor: pointer; transition: color .15s, background .15s;
+  }
+  .lang-switch button:hover { color: var(--text); }
+  .lang-switch button.active { background: #1f2630; color: var(--accent); }
+
+  header { padding: 2rem 0 2rem; }
   .prompt-line { color: var(--muted); font-size: .9rem; margin-bottom: .5rem; }
   .prompt-line .dollar { color: var(--accent); }
   h1 { font-size: 2.2rem; letter-spacing: -.02em; }
@@ -68,7 +90,7 @@
   #terminal { padding: .6rem; height: 440px; }
   @media (max-width: 600px) {
     #terminal { height: 320px; }
-    header { padding: 1.5rem 0 1rem; }
+    header { padding: 1rem 0 1rem; }
     h1 { font-size: 1.7rem; }
   }
 
@@ -94,24 +116,21 @@
 </head>
 <body>
 <div class="container">
+  <div class="topbar">
+    <div class="lang-switch" role="group" aria-label="Idioma / Language">
+      <button data-lang="es">ES</button>
+      <button data-lang="en">EN</button>
+      <button data-lang="pt">PT</button>
+    </div>
+  </div>
+
   <header>
     <div class="prompt-line"><span class="dollar">$</span> whoami</div>
     <h1>Gerson Rivera<span class="cursor"></span></h1>
-    <p class="subtitle">
-      Este portafolio <strong>no es una página normal</strong>: es una terminal real
-      corriendo en mi <strong>Raspberry Pi</strong>, en una jaula segura solo para ti.
-      Explóralo como si fuera mi computadora.
-    </p>
+    <p class="subtitle" data-i18n="subtitle"></p>
   </header>
 
-  <div class="hint">
-    Prueba: <code data-cmd="ls">ls</code> para listar,
-    <code data-cmd="cat bienvenida.txt">cat bienvenida.txt</code> para leer,
-    <code data-cmd="cd proyectos">cd proyectos</code> para entrar a una carpeta,
-    <code data-cmd="tree">tree</code> para ver todo.
-    La sesión dura 10 minutos. Rompe lo que quieras: el sandbox se autodestruye. 😉
-    <span class="tip">💡 Haz clic en cualquier comando para ejecutarlo directamente.</span>
-  </div>
+  <div class="hint" id="hint"></div>
 
   <div class="term-window">
     <div class="term-bar">
@@ -122,37 +141,130 @@
     <div id="terminal"></div>
   </div>
   <div class="status-row">
-    <span class="status" id="status">Conectando…</span>
-    <button id="reconnect">↻ Nueva sesión</button>
+    <span class="status" id="status"></span>
+    <button id="reconnect"></button>
   </div>
 
   <noscript>
     <p style="margin-top:1.5rem; line-height:1.7;">
-      Este portafolio necesita JavaScript para la terminal interactiva.
-      Soy Gerson Hernandez Rivera, Cyber Security &amp; Software Engineer (Junior),
-      en Drogheda, Irlanda (Dublin / Remoto). Mantengo un honeypot en vivo con
-      SOC lab (Cowrie, Grafana, Loki, MITRE ATT&amp;CK), llevé una plataforma
-      full-stack a producción y mantengo laboratorios de segmentación de red y forense.
-      Contacto: gersonrivera02@icloud.com
+      Este portafolio necesita JavaScript para la terminal interactiva. /
+      This portfolio needs JavaScript for the interactive terminal.
+      — Gerson Hernandez Rivera, Cyber Security &amp; Software Engineer (Junior),
+      Drogheda, Ireland (Dublin / Remote). Live honeypot + SOC lab (Cowrie,
+      Grafana, Loki, MITRE ATT&amp;CK), full-stack platform in production,
+      network segmentation &amp; forensics labs.
+      Contact: gersonrivera02@icloud.com
     </p>
   </noscript>
 
   <footer>
-    <div>📫 Contacto: <a href="mailto:gersonrivera02@icloud.com">gersonrivera02@icloud.com</a></div>
+    <div>📫 <span data-i18n="contact"></span>: <a href="mailto:gersonrivera02@icloud.com">gersonrivera02@icloud.com</a></div>
     <div>🔗 <a href="https://github.com/gersonrivera27" target="_blank" rel="noopener">GitHub</a> ·
       <a href="https://linkedin.com/in/gersonhernandezz" target="_blank" rel="noopener">LinkedIn</a></div>
-    <div>⚙️ Hecho con una Raspberry Pi, Docker, Node.js, xterm.js y Cloudflare Tunnel.</div>
+    <div>⚙️ <span data-i18n="made_with"></span></div>
   </footer>
 </div>
 
 <script src="vendor/xterm.min.js"></script>
 <script src="vendor/xterm-addon-fit.min.js"></script>
 <script>
-  const SESSION_MS = 10 * 60 * 1000;
+  // ---------- i18n ----------
+  const I18N = {
+    es: {
+      title: 'Gerson Rivera — Portafolio',
+      meta_desc: 'Portafolio de Gerson Hernandez Rivera, Cyber Security & Software Engineer. Una terminal real en una Raspberry Pi, enjaulada en Docker.',
+      subtitle: 'Este portafolio <strong>no es una página normal</strong>: es una terminal real corriendo en mi <strong>Raspberry Pi</strong>, en una jaula segura solo para ti. Explóralo como si fuera mi computadora.',
+      hint: 'Prueba: <code data-cmd="ls">ls</code> para listar, <code data-cmd="cat bienvenida.txt">cat bienvenida.txt</code> para leer, <code data-cmd="cd proyectos">cd proyectos</code> para entrar a una carpeta, <code data-cmd="tree">tree</code> para ver todo. La sesión dura 10 minutos. Rompe lo que quieras: el sandbox se autodestruye. 😉 <span class="tip">💡 Haz clic en cualquier comando para ejecutarlo directamente.</span>',
+      status_connecting: 'Conectando…',
+      status_connected: '<span class="ok">● Conectado</span> — sesión aislada iniciada',
+      status_disconnected: '<span class="err">● Desconectado</span>',
+      status_error: '<span class="err">● Error de conexión</span>',
+      reconnect: '↻ Nueva sesión',
+      contact: 'Contacto',
+      made_with: 'Hecho con una Raspberry Pi, Docker, Node.js, xterm.js y Cloudflare Tunnel.',
+    },
+    en: {
+      title: 'Gerson Rivera — Portfolio',
+      meta_desc: 'Portfolio of Gerson Hernandez Rivera, Cyber Security & Software Engineer. A real terminal on a Raspberry Pi, sandboxed in Docker.',
+      subtitle: 'This portfolio is <strong>not a normal webpage</strong>: it is a real terminal running on my <strong>Raspberry Pi</strong>, inside a secure sandbox just for you. Explore it as if it were my computer.',
+      hint: 'Try: <code data-cmd="ls">ls</code> to list files, <code data-cmd="cat bienvenida.txt">cat bienvenida.txt</code> to read, <code data-cmd="cd proyectos">cd proyectos</code> to enter a folder, <code data-cmd="tree">tree</code> to see everything. Sessions last 10 minutes. Break whatever you want: the sandbox self-destructs. 😉 <span class="tip">💡 Click any command to run it directly.</span>',
+      status_connecting: 'Connecting…',
+      status_connected: '<span class="ok">● Connected</span> — isolated session started',
+      status_disconnected: '<span class="err">● Disconnected</span>',
+      status_error: '<span class="err">● Connection error</span>',
+      reconnect: '↻ New session',
+      contact: 'Contact',
+      made_with: 'Built with a Raspberry Pi, Docker, Node.js, xterm.js and Cloudflare Tunnel.',
+    },
+    pt: {
+      title: 'Gerson Rivera — Portfólio',
+      meta_desc: 'Portfólio de Gerson Hernandez Rivera, Cyber Security & Software Engineer. Um terminal real em um Raspberry Pi, isolado em Docker.',
+      subtitle: 'Este portfólio <strong>não é uma página normal</strong>: é um terminal real rodando no meu <strong>Raspberry Pi</strong>, dentro de uma jaula segura só para você. Explore como se fosse o meu computador.',
+      hint: 'Experimente: <code data-cmd="ls">ls</code> para listar, <code data-cmd="cat bienvenida.txt">cat bienvenida.txt</code> para ler, <code data-cmd="cd proyectos">cd proyectos</code> para entrar em uma pasta, <code data-cmd="tree">tree</code> para ver tudo. A sessão dura 10 minutos. Quebre o que quiser: o sandbox se autodestrói. 😉 <span class="tip">💡 Clique em qualquer comando para executá-lo diretamente.</span>',
+      status_connecting: 'Conectando…',
+      status_connected: '<span class="ok">● Conectado</span> — sessão isolada iniciada',
+      status_disconnected: '<span class="err">● Desconectado</span>',
+      status_error: '<span class="err">● Erro de conexão</span>',
+      reconnect: '↻ Nova sessão',
+      contact: 'Contato',
+      made_with: 'Feito com um Raspberry Pi, Docker, Node.js, xterm.js e Cloudflare Tunnel.',
+    },
+  };
+
   const statusEl = document.getElementById('status');
   const timerEl = document.getElementById('timer');
   const reconnectBtn = document.getElementById('reconnect');
+  const hintEl = document.getElementById('hint');
 
+  let lang = localStorage.getItem('lang');
+  if (!lang || !I18N[lang]) {
+    const nav = (navigator.language || 'es').slice(0, 2).toLowerCase();
+    lang = I18N[nav] ? nav : 'es';
+  }
+  let lastStatus = 'connecting';
+
+  function t(key) { return I18N[lang][key]; }
+
+  function setStatus(key) {
+    lastStatus = key;
+    statusEl.innerHTML = t('status_' + key);
+  }
+
+  function bindCmds() {
+    hintEl.querySelectorAll('code[data-cmd]').forEach((el) => {
+      el.addEventListener('click', () => {
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          ws.send(el.dataset.cmd + '\r');
+          term.focus();
+        }
+      });
+    });
+  }
+
+  function setLang(l) {
+    lang = l;
+    localStorage.setItem('lang', l);
+    document.documentElement.lang = l;
+    document.title = t('title');
+    document.getElementById('meta-desc').setAttribute('content', t('meta_desc'));
+    document.querySelectorAll('[data-i18n]').forEach((el) => {
+      el.innerHTML = t(el.dataset.i18n);
+    });
+    hintEl.innerHTML = t('hint');
+    bindCmds();
+    reconnectBtn.textContent = t('reconnect');
+    setStatus(lastStatus);
+    document.querySelectorAll('.lang-switch button').forEach((b) => {
+      b.classList.toggle('active', b.dataset.lang === l);
+    });
+  }
+
+  document.querySelectorAll('.lang-switch button').forEach((b) => {
+    b.addEventListener('click', () => setLang(b.dataset.lang));
+  });
+
+  // ---------- Terminal ----------
+  const SESSION_MS = 10 * 60 * 1000;
   const term = new Terminal({
     cursorBlink: true,
     fontSize: 14,
@@ -200,7 +312,7 @@
     ws = new WebSocket(`${proto}://${location.host}/terminal`);
 
     ws.onopen = () => {
-      statusEl.innerHTML = '<span class="ok">● Conectado</span> — sesión aislada iniciada';
+      setStatus('connected');
       reconnectBtn.style.display = 'none';
       startTimer();
       sendResize();
@@ -208,12 +320,12 @@
     };
     ws.onmessage = (e) => term.write(e.data);
     ws.onclose = () => {
-      statusEl.innerHTML = '<span class="err">● Desconectado</span>';
+      setStatus('disconnected');
       reconnectBtn.style.display = 'inline-block';
       stopTimer();
     };
     ws.onerror = () => {
-      statusEl.innerHTML = '<span class="err">● Error de conexión</span>';
+      setStatus('error');
       reconnectBtn.style.display = 'inline-block';
       stopTimer();
     };
@@ -225,18 +337,8 @@
 
   reconnectBtn.addEventListener('click', () => {
     term.reset();
-    statusEl.textContent = 'Conectando…';
+    setStatus('connecting');
     connect();
-  });
-
-  // Comandos clicables del hint: se escriben y ejecutan en la terminal
-  document.querySelectorAll('.hint code[data-cmd]').forEach((el) => {
-    el.addEventListener('click', () => {
-      if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(el.dataset.cmd + '\r');
-        term.focus();
-      }
-    });
   });
 
   window.addEventListener('resize', () => {
@@ -244,6 +346,8 @@
     sendResize();
   });
 
+  setLang(lang);
+  setStatus('connecting');
   connect();
 </script>
 </body>
