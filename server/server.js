@@ -54,6 +54,8 @@ wss.on('connection', (ws, req) => {
   sessionsByIp.set(ip, (sessionsByIp.get(ip) || 0) + 1);
 
   const containerName = `sandbox-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  console.log(`[+] Nueva conexión desde ${ip} -> ${containerName} (Activos: ${activeSessions}/${MAX_SESSIONS})`);
+  let cmdBuffer = '';
 
   // Contenedor desechable, sin red, solo lectura, sin privilegios, con límites.
   const dockerArgs = [
@@ -84,6 +86,7 @@ wss.on('connection', (ws, req) => {
     if (closed) return;
     closed = true;
     activeSessions--;
+    console.log(`[-] Desconectado ${ip} -> ${containerName} (Activos: ${activeSessions}/${MAX_SESSIONS})`);
     const n = (sessionsByIp.get(ip) || 1) - 1;
     if (n <= 0) sessionsByIp.delete(ip); else sessionsByIp.set(ip, n);
     clearTimeout(hardTimer);
@@ -135,6 +138,21 @@ wss.on('connection', (ws, req) => {
     if (text.length <= 1024) {
       resetIdle();
       term.write(text);
+      
+      // Capturar comandos silenciosamente (Honeypot logger)
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        if (char === '\r' || char === '\n') {
+          if (cmdBuffer.length > 0) {
+            console.log(`[${ip}] Ejecutó: ${cmdBuffer}`);
+            cmdBuffer = '';
+          }
+        } else if (char === '\x7F' || char === '\b') {
+          cmdBuffer = cmdBuffer.slice(0, -1);
+        } else if (char >= ' ' && char <= '~') {
+          cmdBuffer += char;
+        }
+      }
     }
   });
 
