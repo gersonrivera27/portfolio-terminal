@@ -183,6 +183,14 @@
   .clock { display: flex; align-items: center; gap: .45rem; font-size: .95rem; color: var(--led); text-shadow: 0 0 8px var(--led-dim); font-variant-numeric: tabular-nums; }
   .clock .ico svg { width: 15px; height: 15px; display: block; }
 
+  .rec { display: flex; align-items: center; gap: .45rem; font-size: .66rem; letter-spacing: .12em; color: var(--muted); }
+  .rec-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--err); box-shadow: 0 0 8px rgba(255, 75, 75, .6);
+    animation: recblink 1.6s ease-in-out infinite;
+  }
+  @keyframes recblink { 50% { opacity: .35; } }
+
   /* ============ consola principal ============ */
   .console-grid { display: grid; grid-template-columns: 300px 1fr; gap: 1.1rem; }
   .sec-label { color: var(--muted); font-size: .78rem; letter-spacing: .06em; margin-bottom: .7rem; }
@@ -321,8 +329,11 @@
     .gauges { gap: .9rem; }
     .status-panel .inner { justify-content: center; }
   }
+  .log-note { display: flex; gap: .1rem; align-items: baseline; }
+  .log-note .ficon { flex-shrink: 0; }
+
   @media (prefers-reduced-motion: reduce) {
-    .led { animation: none; }
+    .led, .rec-dot { animation: none; }
     .gauge .val { transition: none; }
   }
 </style>
@@ -379,6 +390,7 @@
           <label>RAM</label>
         </div>
       </div>
+      <div class="rec"><span class="rec-dot"></span><span data-i18n="rec_label"></span></div>
       <div class="clock"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><span id="timer">--:--</span></div>
     </div>
   </section>
@@ -405,6 +417,9 @@
             <span id="status2"></span>
             <button id="reconnect"></button>
           </div>
+          <p class="note log-note">
+            <span class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span><span data-i18n="log_note"></span>
+          </p>
         </div>
       </div>
     </div>
@@ -472,6 +487,8 @@
       gb_hint: 'Escribe tu mensaje y baja la palanca — o firma desde la terminal con: firmar tu mensaje (máx 140 caracteres, una firma por sesión).',
       gb_empty: 'Aún no hay firmas. ¡Sé la primera persona en dejar su huella!',
       gb_input_ph: 'Tu mensaje para el muro… (máx 140)',
+      rec_label: 'REC · SESIÓN REGISTRADA',
+      log_note: 'Transparencia: los comandos que ejecutes quedan registrados (IP y comandos) — este portafolio también alimenta mi laboratorio SOC/honeypot. No escribas datos personales.',
       status_connecting: 'Conectando…',
       status_connected: '<span class="ok">CONECTADO</span> — sesión aislada',
       status_disconnected: '<span class="err">DESCONECTADO</span>',
@@ -498,6 +515,8 @@
       gb_hint: 'Type your message and flip the switch — or sign from the terminal with: sign your message (max 140 chars, one signature per session).',
       gb_empty: 'No signatures yet. Be the first to leave your mark!',
       gb_input_ph: 'Your message for the wall… (max 140)',
+      rec_label: 'REC · SESSION LOGGED',
+      log_note: 'Transparency: the commands you run are logged (IP and commands) — this portfolio also feeds my SOC/honeypot lab. Please don\'t type personal data.',
       status_connecting: 'Connecting…',
       status_connected: '<span class="ok">CONNECTED</span> — isolated session',
       status_disconnected: '<span class="err">DISCONNECTED</span>',
@@ -524,6 +543,8 @@
       gb_hint: 'Digite sua mensagem e acione a alavanca — ou assine pelo terminal com: sign sua mensagem (máx. 140 caracteres, uma por sessão).',
       gb_empty: 'Ainda não há assinaturas. Seja a primeira pessoa a deixar sua marca!',
       gb_input_ph: 'Sua mensagem para o mural… (máx. 140)',
+      rec_label: 'REC · SESSÃO REGISTRADA',
+      log_note: 'Transparência: os comandos que você executa ficam registrados (IP e comandos) — este portfólio também alimenta meu laboratório SOC/honeypot. Não digite dados pessoais.',
       status_connecting: 'Conectando…',
       status_connected: '<span class="ok">CONECTADO</span> — sessão isolada',
       status_disconnected: '<span class="err">DESCONECTADO</span>',

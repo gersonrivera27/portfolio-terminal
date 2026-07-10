@@ -18,3 +18,6 @@ Deja tu huella:  firmar tu mensaje aquí
 Lee las firmas:  cat libro-visitas.txt
 
 English? → cd english  (everything is translated there)
+
+Transparencia: esta sesión queda registrada (comandos e IP).
+Este portafolio también alimenta mi laboratorio SOC/honeypot.

@@ -12,7 +12,7 @@ const pty = require('node-pty');
 // ---------- Configuración ----------
 const PORT = process.env.PORT || 3000;
 const IMAGE = process.env.SANDBOX_IMAGE || 'portfolio-sandbox';
-const MAX_SESSIONS = 5;          // sesiones simultáneas en total
+const MAX_SESSIONS = 10;         // sesiones simultáneas en total
 const MAX_PER_IP = 2;            // sesiones simultáneas por IP
 const SESSION_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutos por sesión
 const IDLE_TIMEOUT_MS = 3 * 60 * 1000;     // 3 minutos sin teclear

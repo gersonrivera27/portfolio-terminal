@@ -18,3 +18,6 @@ Leave your mark:  sign your message here
 Read the wall:    cat guestbook.txt
 
 ¿Español? → cd ~  (los archivos en español están ahí)
+
+Transparency: this session is logged (commands and IP).
+This portfolio also feeds my SOC/honeypot lab.
