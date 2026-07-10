@@ -3,274 +3,444 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#0d1117">
+<meta name="theme-color" content="#0a0e12">
 <title>Gerson Rivera — Portafolio</title>
 <meta name="description" id="meta-desc" content="Portafolio de Gerson Hernandez Rivera, Cyber Security & Software Engineer. Una terminal real en una Raspberry Pi, enjaulada en Docker.">
 <meta property="og:title" content="Gerson Rivera — Portfolio">
 <meta property="og:description" content="Not a normal webpage: a real terminal running on my Raspberry Pi, sandboxed in Docker. / Una terminal real corriendo en mi Raspberry Pi.">
 <meta property="og:type" content="website">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%230d1117'/%3E%3Ctext x='18' y='68' font-family='monospace' font-size='48' fill='%2358e6a8'%3E%26gt;_%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%230a0e12'/%3E%3Ctext x='18' y='68' font-family='monospace' font-size='48' fill='%2300e5ff'%3E%26gt;_%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="vendor/xterm.min.css">
 <style>
+  @font-face {
+    font-family: 'Press Start 2P';
+    src: url('vendor/press-start-2p.woff2') format('woff2');
+    font-display: swap;
+  }
+
   :root {
-    --bg: #0d1117;
-    --panel: #161b22;
-    --panel-2: #1a2129;
-    --border: #30363d;
-    --text: #e6edf3;
-    --muted: #8b949e;
-    --accent: #58e6a8;
-    --accent-dim: rgba(88, 230, 168, .35);
-    --danger: #ff5f57;
+    --bg: #0a0e12;
+    --panel: #0d1319;
+    --panel-2: #10161c;
+    --border: #1d252e;
+    --metal-hi: #39424c;
+    --text: #d7e6ee;
+    --muted: #7b8b96;
+    --neon: #00e5ff;
+    --neon-dim: rgba(0, 229, 255, .35);
+    --neon-faint: rgba(0, 229, 255, .12);
+    --led: #3aff6e;
+    --led-dim: rgba(58, 255, 110, .4);
+    --warn: #ffc857;
+    --err: #ff4b4b;
+    --term-green: #45f376;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
   body {
-    background:
-      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(88, 230, 168, .07), transparent),
-      var(--bg);
+    background: var(--bg);
     color: var(--text);
     font-family: "SF Mono", "Fira Code", Menlo, Consolas, monospace;
     min-height: 100vh;
   }
-  /* Rejilla de fondo sutil, estilo blueprint */
+  /* ---- fondo: rejilla PCB con vías ---- */
   body::before {
-    content: '';
-    position: fixed; inset: 0; z-index: -1;
+    content: ''; position: fixed; inset: 0; z-index: -1;
+    background-image:
+      radial-gradient(circle at 30% -5%, rgba(0, 229, 255, .06), transparent 45%),
+      radial-gradient(rgba(0, 229, 255, .07) 1px, transparent 1.6px),
+      repeating-linear-gradient(0deg, rgba(0, 229, 255, .028) 0 1px, transparent 1px 28px),
+      repeating-linear-gradient(90deg, rgba(0, 229, 255, .028) 0 1px, transparent 1px 28px);
+    background-size: auto, 28px 28px, auto, auto;
+  }
+  .container { max-width: 1080px; margin: 0 auto; padding: 1.4rem 1.2rem 4rem; display: grid; gap: 1.2rem; }
+
+  /* ============ módulos con bisel metálico ============ */
+  .module {
+    position: relative;
+    border-radius: 16px;
+    padding: 13px;
+    border: 1px solid var(--metal-hi);
     background:
-      linear-gradient(rgba(88, 230, 168, .025) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(88, 230, 168, .025) 1px, transparent 1px);
-    background-size: 34px 34px;
-    mask-image: linear-gradient(to bottom, rgba(0,0,0,.9), transparent 70%);
-    -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,.9), transparent 70%);
+      linear-gradient(160deg, rgba(255, 255, 255, .09), rgba(0, 0, 0, .38) 55%),
+      repeating-linear-gradient(90deg, #262d34 0px, #2c333b 1px, #262d34 2px);
+    box-shadow:
+      0 14px 34px rgba(0, 0, 0, .6),
+      inset 0 1px 0 rgba(255, 255, 255, .14),
+      0 0 26px var(--neon-faint);
   }
-  .container { max-width: 960px; margin: 0 auto; padding: 1.25rem 1.25rem 4rem; }
+  /* bisel de fibra de carbono (módulo principal) */
+  .module.carbon {
+    background-color: #14181c;
+    background-image:
+      linear-gradient(160deg, rgba(255, 255, 255, .06), rgba(0, 0, 0, .45) 60%),
+      linear-gradient(45deg, rgba(255, 255, 255, .05) 25%, transparent 25%, transparent 75%, rgba(255, 255, 255, .05) 75%),
+      linear-gradient(45deg, rgba(255, 255, 255, .05) 25%, transparent 25%, transparent 75%, rgba(255, 255, 255, .05) 75%);
+    background-position: 0 0, 0 0, 4px 4px;
+    background-size: auto, 8px 8px, 8px 8px;
+  }
+  .inner {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: inset 0 3px 14px rgba(0, 0, 0, .7), inset 0 0 0 1px rgba(0, 229, 255, .04);
+    padding: 1.1rem 1.2rem;
+  }
 
-  /* ---- barra superior ---- */
-  .topbar {
-    display: flex; justify-content: space-between; align-items: center;
-    gap: 1rem; padding: .4rem 0;
+  /* ---- tornillos ---- */
+  .screw {
+    position: absolute; width: 13px; height: 13px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #cfd6dc, #6a7480 45%, #2c343c 85%);
+    box-shadow: inset 0 -1px 2px rgba(0, 0, 0, .7), 0 1px 2px rgba(0, 0, 0, .6);
   }
-  .sys {
-    color: var(--muted); font-size: .75rem; letter-spacing: .05em;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  .screw::after {
+    content: ''; position: absolute; left: 2px; right: 2px; top: 5.5px; height: 1.6px;
+    background: rgba(20, 26, 32, .85); border-radius: 1px; transform: rotate(38deg);
   }
-  .sys .on { color: var(--accent); animation: pulse 2.2s ease-in-out infinite; }
-  .lang-switch {
-    display: flex; gap: .25rem; flex-shrink: 0;
-    background: var(--panel); border: 1px solid var(--border);
-    border-radius: 8px; padding: .25rem;
-  }
-  .lang-switch button {
-    background: transparent; color: var(--muted);
-    border: none; border-radius: 5px;
-    font: inherit; font-size: .8rem; padding: .3rem .6rem;
-    cursor: pointer; transition: color .15s, background .15s;
-  }
-  .lang-switch button:hover { color: var(--text); }
-  .lang-switch button.active { background: #1f2630; color: var(--accent); }
+  .screw.tl { top: 6px; left: 6px; }
+  .screw.tr { top: 6px; right: 6px; transform: rotate(72deg); }
+  .screw.bl { bottom: 6px; left: 6px; transform: rotate(140deg); }
+  .screw.br { bottom: 6px; right: 6px; transform: rotate(23deg); }
 
-  /* ---- header ---- */
-  header { padding: 2.2rem 0 1.2rem; }
-  .prompt-line { color: var(--muted); font-size: .9rem; margin-bottom: .5rem; }
-  .prompt-line .dollar, .typed .dollar { color: var(--accent); }
+  /* ============ encabezado ============ */
+  .hdr .inner { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
   h1 {
-    font-size: clamp(1.7rem, 5.5vw, 2.4rem); letter-spacing: -.02em;
-    color: var(--accent);
-    text-shadow: 0 0 22px var(--accent-dim);
+    font-family: 'Press Start 2P', "SF Mono", monospace;
+    font-size: clamp(1rem, 3.4vw, 1.7rem);
+    color: var(--neon);
+    letter-spacing: .05em;
+    text-shadow: 0 0 6px var(--neon-dim), 0 0 26px var(--neon-dim);
   }
-  h1 .cursor {
-    display: inline-block; width: .55em; height: 1.05em;
-    background: var(--accent); vertical-align: text-bottom;
-    box-shadow: 0 0 10px var(--accent-dim);
-    animation: blink 1.1s steps(1) infinite;
-  }
-  @keyframes blink { 50% { opacity: 0; } }
-  @keyframes pulse { 50% { opacity: .45; } }
-  .typed { margin-top: .5rem; color: var(--text); font-size: .95rem; min-height: 1.4em; }
-  .typed .tcursor { color: var(--accent); animation: blink 1s steps(1) infinite; }
-  .subtitle { color: var(--muted); margin-top: .8rem; line-height: 1.65; font-size: .92rem; max-width: 46rem; }
-  .subtitle strong { color: var(--accent); font-weight: 600; }
+  .role { color: var(--muted); font-size: .72rem; letter-spacing: .28em; margin-top: .55rem; }
+  .subtitle { color: var(--muted); font-size: .8rem; line-height: 1.6; margin-top: .7rem; max-width: 46rem; }
+  .subtitle strong { color: var(--neon); font-weight: 600; }
 
-  /* ---- badges de seguridad ---- */
-  .badges { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1.1rem 0 0; }
-  .badge {
-    display: inline-flex; align-items: center; gap: .4em;
-    border: 1px solid var(--border); border-radius: 999px;
-    background: var(--panel); color: var(--muted);
-    font-size: .72rem; padding: .32em .8em; letter-spacing: .02em;
-    white-space: nowrap;
+  /* chips de idioma estilo circuito integrado */
+  .lang-switch { display: flex; gap: .55rem; }
+  .lang-switch button {
+    position: relative;
+    font: inherit; font-size: .74rem; letter-spacing: .08em;
+    color: var(--muted); cursor: pointer;
+    padding: .5rem .8rem;
+    background: linear-gradient(180deg, #1c232a, #12181e);
+    border: 1px solid #2b343d; border-radius: 4px;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, .65), 0 1px 0 rgba(255, 255, 255, .06);
+    transition: color .15s, box-shadow .15s, border-color .15s;
   }
-  .badge::before { content: '✓'; color: var(--accent); font-weight: 700; }
+  /* patitas del chip */
+  .lang-switch button::before, .lang-switch button::after {
+    content: ''; position: absolute; left: 6px; right: 6px; height: 3px;
+    background: repeating-linear-gradient(90deg, #55606a 0 3px, transparent 3px 7px);
+  }
+  .lang-switch button::before { top: -4px; }
+  .lang-switch button::after { bottom: -4px; }
+  .lang-switch button:hover { color: var(--text); }
+  .lang-switch button.active {
+    color: var(--neon); border-color: var(--neon);
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, .65), 0 0 12px var(--neon-dim);
+    text-shadow: 0 0 8px var(--neon-dim);
+  }
 
-  /* ---- comandos listos ---- */
-  .sec-label {
-    color: var(--muted); font-size: .8rem; letter-spacing: .06em;
-    margin: 1.6rem 0 .7rem;
+  /* ============ panel de estado ============ */
+  .status-panel .inner {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 1.2rem; flex-wrap: wrap;
+    background:
+      radial-gradient(rgba(58, 255, 110, .06) 1px, transparent 1.5px),
+      repeating-linear-gradient(0deg, rgba(58, 255, 110, .045) 0 1px, transparent 1px 14px),
+      repeating-linear-gradient(90deg, rgba(58, 255, 110, .045) 0 1px, transparent 1px 14px),
+      #0b1710;
+    background-size: 14px 14px, auto, auto, auto;
   }
-  .sec-label .hash { color: var(--accent); }
-  .cmd-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: .6rem;
+  .led-block { display: flex; align-items: center; gap: .6rem; font-size: .78rem; color: var(--muted); }
+  .led {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--led); box-shadow: 0 0 8px var(--led-dim), 0 0 2px var(--led);
+    animation: ledblink 2.4s ease-in-out infinite;
   }
+  .led.warn { background: var(--warn); box-shadow: 0 0 8px rgba(255, 200, 87, .5); animation: none; }
+  .led.err { background: var(--err); box-shadow: 0 0 8px rgba(255, 75, 75, .5); animation: none; }
+  @keyframes ledblink { 50% { opacity: .55; } }
+  .status { font-size: .78rem; }
+  .status .ok { color: var(--led); }
+  .status .err { color: var(--err); }
+
+  .gauges { display: flex; gap: 1.4rem; }
+  .gauge { display: flex; flex-direction: column; align-items: center; gap: .15rem; }
+  .gauge svg { transform: rotate(-90deg); }
+  .gauge .track { stroke: #102b31; }
+  .gauge .val {
+    stroke: var(--neon); stroke-linecap: round;
+    filter: drop-shadow(0 0 4px var(--neon-dim));
+    transition: stroke-dashoffset .8s ease;
+  }
+  .gauge .pct {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-size: .68rem; color: var(--neon); text-shadow: 0 0 6px var(--neon-dim);
+  }
+  .gauge .ring { position: relative; width: 58px; height: 58px; }
+  .gauge label { font-size: .6rem; letter-spacing: .2em; color: var(--muted); }
+
+  .clock { display: flex; align-items: center; gap: .45rem; font-size: .95rem; color: var(--led); text-shadow: 0 0 8px var(--led-dim); font-variant-numeric: tabular-nums; }
+  .clock .ico { font-size: .85rem; }
+
+  /* ============ consola principal ============ */
+  .console-grid { display: grid; grid-template-columns: 300px 1fr; gap: 1.1rem; }
+  .sec-label { color: var(--muted); font-size: .78rem; letter-spacing: .06em; margin-bottom: .7rem; }
+  .sec-label .hash { color: var(--neon); }
+
+  .cmd-grid { display: grid; gap: .55rem; }
   .cmd-btn {
-    background: var(--panel); border: 1px solid var(--border);
-    border-radius: 8px; padding: .65rem .8rem;
+    display: flex; align-items: flex-start; gap: .55rem;
     font: inherit; text-align: left; cursor: pointer;
-    transition: border-color .15s, background .15s, transform .15s, box-shadow .15s;
+    padding: .6rem .7rem; border-radius: 9px;
+    color: var(--text);
+    background: linear-gradient(150deg, rgba(28, 36, 44, .9), rgba(12, 17, 22, .95));
+    border: 1px solid #232c35;
+    box-shadow:
+      4px 4px 10px rgba(0, 0, 0, .55),
+      -2px -2px 6px rgba(255, 255, 255, .035),
+      inset 0 1px 0 rgba(255, 255, 255, .05);
+    transition: border-color .15s, box-shadow .15s, transform .1s;
   }
   .cmd-btn:hover, .cmd-btn:focus-visible {
-    border-color: var(--accent); background: var(--panel-2);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 18px rgba(0, 0, 0, .35), 0 0 0 1px var(--accent-dim);
-    outline: none;
+    outline: none; border-color: var(--neon);
+    box-shadow: 4px 4px 12px rgba(0, 0, 0, .55), 0 0 16px var(--neon-dim), inset 0 1px 0 rgba(255, 255, 255, .06);
   }
-  .cmd-btn:active { transform: translateY(0); }
-  .cmd-btn .c { display: block; color: var(--accent); font-weight: 600; font-size: .85rem; }
+  .cmd-btn:hover .c { text-shadow: 0 0 9px var(--neon-dim); }
+  .cmd-btn:active {
+    transform: translateY(1px);
+    box-shadow: inset 3px 3px 8px rgba(0, 0, 0, .7);
+  }
+  .cmd-btn .ico { font-size: .85rem; line-height: 1.4; filter: grayscale(.25); }
+  .cmd-btn .c { display: block; color: var(--neon); font-weight: 600; font-size: .8rem; transition: text-shadow .15s; }
   .cmd-btn .c::before { content: '$ '; color: var(--muted); font-weight: 400; }
-  .cmd-btn .d { display: block; color: var(--muted); font-size: .72rem; margin-top: .25rem; }
-  .note { color: var(--muted); font-size: .78rem; margin: .7rem 0 1.2rem; line-height: 1.6; }
+  .cmd-btn .d { display: block; color: var(--muted); font-size: .68rem; margin-top: .2rem; }
+  .note { color: var(--muted); font-size: .74rem; margin-top: .8rem; line-height: 1.6; }
 
-  /* ---- libro de visitas ---- */
-  .gbook {
-    display: grid; gap: .5rem;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  }
-  .gb-item {
-    background: var(--panel); border: 1px solid var(--border);
-    border-left: 3px solid var(--accent); border-radius: 8px;
-    padding: .6rem .8rem; display: flex; flex-direction: column; gap: .3rem;
-  }
-  .gb-msg { color: var(--text); font-size: .85rem; line-height: 1.5; overflow-wrap: anywhere; }
-  .gb-date { color: var(--muted); font-size: .7rem; }
-  .gb-empty { color: var(--muted); font-size: .85rem; }
-
-  /* ---- terminal ---- */
+  .term-side { display: flex; flex-direction: column; min-width: 0; }
   .term-window {
-    position: relative;
-    border: 1px solid var(--border); border-radius: 10px;
-    overflow: hidden; background: #0a0e14;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, .5), 0 0 60px rgba(88, 230, 168, .05);
+    position: relative; flex: 1;
+    border: 1px solid #060a08; border-radius: 8px;
+    overflow: hidden; background: #050807;
+    box-shadow: inset 0 0 24px rgba(0, 0, 0, .9), 0 0 18px rgba(69, 243, 118, .05);
   }
-  /* scanlines sutiles tipo CRT */
   .term-window::after {
     content: ''; position: absolute; inset: 0; z-index: 5; pointer-events: none;
-    background: repeating-linear-gradient(0deg, rgba(255, 255, 255, .014) 0 1px, transparent 1px 3px);
+    background: repeating-linear-gradient(0deg, rgba(255, 255, 255, .015) 0 1px, transparent 1px 3px);
   }
   .term-bar {
     display: flex; align-items: center; gap: .5rem;
-    background: var(--panel); padding: .6rem .9rem;
-    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, #151b21, #0e1318);
+    padding: .5rem .8rem; border-bottom: 1px solid #060a08;
   }
-  .dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; box-shadow: inset 0 -1px 2px rgba(0,0,0,.5); }
   .dot.r { background: #ff5f57; } .dot.y { background: #febc2e; } .dot.g { background: #28c840; }
-  .term-title {
-    color: var(--muted); font-size: .8rem; margin-left: .5rem;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .term-timer { color: var(--muted); font-size: .8rem; margin-left: auto; font-variant-numeric: tabular-nums; flex-shrink: 0; }
-  #terminal { padding: .6rem; height: clamp(300px, 52vh, 440px); }
-
-  .status-row {
-    display: flex; align-items: center; flex-wrap: wrap; gap: .8rem;
-    margin-top: .6rem; font-size: .8rem; color: var(--muted);
-  }
-  .status .ok { color: var(--accent); animation: pulse 2.2s ease-in-out infinite; }
-  .status .err { color: var(--danger); }
+  .term-title { color: var(--muted); font-size: .74rem; margin-left: .4rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #terminal { padding: .5rem; height: clamp(300px, 48vh, 430px); }
+  .status-row { display: flex; align-items: center; flex-wrap: wrap; gap: .8rem; margin-top: .6rem; font-size: .76rem; color: var(--muted); }
   #reconnect {
-    display: none;
-    background: transparent; color: var(--accent);
-    border: 1px solid var(--accent); border-radius: 6px;
-    padding: .35rem .9rem; font: inherit; font-size: .8rem; cursor: pointer;
-    transition: background .15s, box-shadow .15s;
+    display: none; font: inherit; font-size: .76rem; cursor: pointer;
+    color: var(--neon); background: transparent;
+    border: 1px solid var(--neon); border-radius: 6px; padding: .32rem .85rem;
+    transition: box-shadow .15s, background .15s;
   }
-  #reconnect:hover { background: #1f2630; box-shadow: 0 0 14px var(--accent-dim); }
+  #reconnect:hover { background: rgba(0, 229, 255, .08); box-shadow: 0 0 14px var(--neon-dim); }
 
-  footer { margin-top: 3rem; color: var(--muted); font-size: .85rem; line-height: 1.9; }
-  footer a { color: var(--accent); text-decoration: none; }
-  footer a:hover { text-decoration: underline; }
-
-  /* ---- móvil ---- */
-  @media (max-width: 600px) {
-    .container { padding: .9rem .85rem 3rem; }
-    header { padding: 1.4rem 0 .8rem; }
-    .subtitle { font-size: .85rem; }
-    .badges { gap: .4rem; }
-    .badge { font-size: .68rem; }
-    .cmd-grid { grid-template-columns: repeat(2, 1fr); gap: .5rem; }
-    .cmd-btn { padding: .55rem .65rem; }
-    .cmd-btn .c { font-size: .78rem; }
-    #terminal { padding: .4rem; height: 46vh; }
-    .term-title { font-size: .72rem; }
+  /* ============ guestbook ============ */
+  .gbook { display: grid; gap: .55rem; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+  .gb-item {
+    display: flex; gap: .65rem; align-items: flex-start;
+    background: linear-gradient(150deg, rgba(24, 31, 38, .9), rgba(12, 17, 22, .95));
+    border: 1px solid #232c35; border-left: 3px solid var(--neon);
+    border-radius: 9px; padding: .6rem .75rem;
+    box-shadow: 3px 3px 9px rgba(0, 0, 0, .5), inset 0 1px 0 rgba(255, 255, 255, .04);
   }
+  .gb-avatar { flex-shrink: 0; border-radius: 4px; image-rendering: pixelated; box-shadow: 0 0 8px var(--neon-faint); }
+  .gb-msg { color: var(--text); font-size: .8rem; line-height: 1.5; overflow-wrap: anywhere; }
+  .gb-date { display: block; color: var(--muted); font-size: .65rem; margin-top: .3rem; }
+  .gb-empty { color: var(--muted); font-size: .8rem; }
 
+  .gb-compose { display: flex; align-items: center; gap: 1rem; margin-top: 1rem; }
+  #gb-input {
+    flex: 1; font: inherit; font-size: .82rem; color: var(--text);
+    background: #0a0f14; border: 1px solid #232c35; border-radius: 8px;
+    padding: .7rem .85rem;
+    box-shadow: inset 0 3px 9px rgba(0, 0, 0, .65);
+  }
+  #gb-input:focus { outline: none; border-color: var(--neon); box-shadow: inset 0 3px 9px rgba(0, 0, 0, .65), 0 0 12px var(--neon-faint); }
+  #gb-input.shake { animation: shake .3s; border-color: var(--err); }
+  @keyframes shake { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+
+  /* interruptor de palanca industrial */
+  .toggle { position: relative; display: inline-block; width: 46px; height: 74px; flex-shrink: 0; cursor: pointer; }
+  .toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+  .lever {
+    position: absolute; inset: 0; border-radius: 10px;
+    background: linear-gradient(160deg, #303a44, #171d23);
+    border: 1px solid var(--metal-hi);
+    box-shadow: inset 0 3px 10px rgba(0, 0, 0, .8), 0 3px 8px rgba(0, 0, 0, .5);
+  }
+  .lever::before { /* perno */
+    content: ''; position: absolute; left: 50%; top: 50%;
+    width: 26px; height: 26px; margin: -13px 0 0 -13px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #d9e0e6, #77828d 50%, #333c45 90%);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, .7);
+    transition: transform .18s cubic-bezier(.6, 1.6, .6, 1);
+    transform: translateY(14px);
+  }
+  .lever::after { /* palanca */
+    content: ''; position: absolute; left: 50%; top: 50%;
+    width: 9px; height: 30px; margin-left: -4.5px; border-radius: 5px;
+    background: linear-gradient(180deg, #aab5bf, #59636d);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, .7);
+    transition: transform .18s cubic-bezier(.6, 1.6, .6, 1);
+    transform: translateY(2px);
+    transform-origin: 50% 100%;
+  }
+  .toggle input:checked + .lever {
+    box-shadow: inset 0 3px 10px rgba(0, 0, 0, .8), 0 0 18px var(--led-dim), 0 3px 8px rgba(0, 0, 0, .5);
+    border-color: var(--led);
+  }
+  .toggle input:checked + .lever::before { transform: translateY(-14px); background: radial-gradient(circle at 35% 30%, #d4ffe2, #3aff6e 55%, #14733a 95%); }
+  .toggle input:checked + .lever::after { transform: translateY(-26px); }
+  .toggle-label { font-size: .62rem; letter-spacing: .15em; color: var(--muted); text-align: center; display: block; margin-top: .3rem; }
+
+  footer { color: var(--muted); font-size: .8rem; line-height: 1.9; padding: 0 .4rem; }
+  footer a { color: var(--neon); text-decoration: none; }
+  footer a:hover { text-decoration: underline; text-shadow: 0 0 8px var(--neon-dim); }
+
+  /* ---- responsive ---- */
+  @media (max-width: 760px) {
+    .console-grid { grid-template-columns: 1fr; }
+    .cmd-grid { grid-template-columns: repeat(2, 1fr); }
+    #terminal { height: 44vh; }
+    .gauges { gap: .9rem; }
+    .status-panel .inner { justify-content: center; }
+  }
   @media (prefers-reduced-motion: reduce) {
-    h1 .cursor, .typed .tcursor, .status .ok, .sys .on { animation: none; }
+    .led { animation: none; }
+    .gauge .val { transition: none; }
   }
 </style>
 </head>
 <body>
 <div class="container">
-  <div class="topbar">
-    <span class="sys">[ <span class="on">●</span> raspberry-pi :: docker-sandbox :: online ]</span>
-    <div class="lang-switch" role="group" aria-label="Idioma / Language">
-      <button data-lang="es">ES</button>
-      <button data-lang="en">EN</button>
-      <button data-lang="pt">PT</button>
-    </div>
-  </div>
 
-  <header>
-    <div class="prompt-line"><span class="dollar">$</span> whoami</div>
-    <h1>Gerson Rivera<span class="cursor"></span></h1>
-    <div class="typed"><span class="dollar">&gt;</span> <span id="typed-text"></span><span class="tcursor">█</span></div>
-    <p class="subtitle" data-i18n="subtitle"></p>
-    <div class="badges">
-      <span class="badge" data-i18n="badge_sandbox"></span>
-      <span class="badge" data-i18n="badge_nonet"></span>
-      <span class="badge" data-i18n="badge_ro"></span>
-      <span class="badge" data-i18n="badge_ttl"></span>
+  <!-- ===== encabezado ===== -->
+  <header class="module hdr">
+    <span class="screw tl"></span><span class="screw tr"></span><span class="screw bl"></span><span class="screw br"></span>
+    <div class="inner">
+      <div>
+        <h1>GERSON RIVERA</h1>
+        <div class="role">CYBER SECURITY &amp; SOFTWARE ENGINEER</div>
+        <p class="subtitle" data-i18n="subtitle"></p>
+      </div>
+      <div class="lang-switch" role="group" aria-label="Idioma / Language">
+        <button data-lang="es">ES</button>
+        <button data-lang="en">EN</button>
+        <button data-lang="pt">PT</button>
+      </div>
     </div>
   </header>
 
-  <div class="sec-label"><span class="hash">##</span> <span data-i18n="cmd_title"></span></div>
-  <div class="cmd-grid" id="cmds" role="group" aria-label="Comandos"></div>
-  <p class="note" data-i18n="note"></p>
-
-  <div class="term-window">
-    <div class="term-bar">
-      <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
-      <span class="term-title">visitante@raspberry-pi: ~</span>
-      <span class="term-timer" id="timer"></span>
+  <!-- ===== panel de estado ===== -->
+  <section class="module status-panel">
+    <span class="screw tl"></span><span class="screw tr"></span><span class="screw bl"></span><span class="screw br"></span>
+    <div class="inner">
+      <div class="led-block">
+        <span class="led" id="led"></span>
+        <span class="status" id="status"></span>
+      </div>
+      <div class="gauges">
+        <div class="gauge">
+          <div class="ring">
+            <svg width="58" height="58" viewBox="0 0 58 58">
+              <circle class="track" cx="29" cy="29" r="24" fill="none" stroke-width="5"/>
+              <circle class="val" id="g-cpu" cx="29" cy="29" r="24" fill="none" stroke-width="5"
+                stroke-dasharray="150.8" stroke-dashoffset="150.8"/>
+            </svg>
+            <span class="pct" id="g-cpu-t">0%</span>
+          </div>
+          <label>CPU</label>
+        </div>
+        <div class="gauge">
+          <div class="ring">
+            <svg width="58" height="58" viewBox="0 0 58 58">
+              <circle class="track" cx="29" cy="29" r="24" fill="none" stroke-width="5"/>
+              <circle class="val" id="g-ram" cx="29" cy="29" r="24" fill="none" stroke-width="5"
+                stroke-dasharray="150.8" stroke-dashoffset="150.8"/>
+            </svg>
+            <span class="pct" id="g-ram-t">0%</span>
+          </div>
+          <label>RAM</label>
+        </div>
+      </div>
+      <div class="clock"><span class="ico">⏱</span><span id="timer">--:--</span></div>
     </div>
-    <div id="terminal"></div>
-  </div>
-  <div class="status-row">
-    <span class="status" id="status"></span>
-    <button id="reconnect"></button>
-  </div>
+  </section>
 
-  <div class="sec-label"><span class="hash">##</span> <span data-i18n="gb_title"></span></div>
-  <div class="gbook" id="gbook" aria-live="polite"></div>
-  <p class="note" data-i18n="gb_hint"></p>
+  <!-- ===== consola principal ===== -->
+  <section class="module carbon">
+    <span class="screw tl"></span><span class="screw tr"></span><span class="screw bl"></span><span class="screw br"></span>
+    <div class="inner">
+      <div class="console-grid">
+        <div class="cmd-panel">
+          <div class="sec-label"><span class="hash">##</span> <span data-i18n="cmd_title"></span></div>
+          <div class="cmd-grid" id="cmds" role="group" aria-label="Comandos"></div>
+          <p class="note" data-i18n="note"></p>
+        </div>
+        <div class="term-side">
+          <div class="term-window">
+            <div class="term-bar">
+              <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+              <span class="term-title">visitante@raspberry-pi: ~</span>
+            </div>
+            <div id="terminal"></div>
+          </div>
+          <div class="status-row">
+            <span id="status2"></span>
+            <button id="reconnect"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== guestbook ===== -->
+  <section class="module">
+    <span class="screw tl"></span><span class="screw tr"></span><span class="screw bl"></span><span class="screw br"></span>
+    <div class="inner">
+      <div class="sec-label"><span class="hash">##</span> <span data-i18n="gb_title"></span></div>
+      <div class="gbook" id="gbook" aria-live="polite"></div>
+      <div class="gb-compose">
+        <input id="gb-input" maxlength="140" autocomplete="off" data-i18n-ph="gb_input_ph">
+        <div>
+          <label class="toggle">
+            <input type="checkbox" id="gb-toggle" aria-label="Enviar firma">
+            <span class="lever"></span>
+          </label>
+          <span class="toggle-label">SEND</span>
+        </div>
+      </div>
+      <p class="note" data-i18n="gb_hint"></p>
+    </div>
+  </section>
 
   <noscript>
-    <p style="margin-top:1.5rem; line-height:1.7;">
+    <p style="line-height:1.7;">
       Este portafolio necesita JavaScript para la terminal interactiva. /
       This portfolio needs JavaScript for the interactive terminal.
       — Gerson Hernandez Rivera, Cyber Security &amp; Software Engineer (Junior),
       Drogheda, Ireland (Dublin / Remote). Live honeypot + SOC lab (Cowrie,
       Grafana, Loki, MITRE ATT&amp;CK), full-stack platform in production,
-      network segmentation &amp; forensics labs.
-      Contact: gersonrivera02@icloud.com
+      network segmentation &amp; forensics labs. Contact: gersonrivera02@icloud.com
     </p>
   </noscript>
 
   <footer>
-    <div>📫 <span data-i18n="contact"></span>: <a href="mailto:gersonrivera02@icloud.com">gersonrivera02@icloud.com</a></div>
-    <div>🔗 <a href="https://github.com/gersonrivera27" target="_blank" rel="noopener">GitHub</a> ·
-      <a href="https://linkedin.com/in/gersonhernandezz" target="_blank" rel="noopener">LinkedIn</a></div>
+    <div>📫 <span data-i18n="contact"></span>: <a href="mailto:gersonrivera02@icloud.com">gersonrivera02@icloud.com</a>
+      · <a href="https://github.com/gersonrivera27" target="_blank" rel="noopener">GitHub</a>
+      · <a href="https://linkedin.com/in/gersonhernandezz" target="_blank" rel="noopener">LinkedIn</a></div>
     <div>⚙️ <span data-i18n="made_with"></span></div>
   </footer>
 </div>
@@ -283,28 +453,25 @@
     es: {
       title: 'Gerson Rivera — Portafolio',
       meta_desc: 'Portafolio de Gerson Hernandez Rivera, Cyber Security & Software Engineer. Una terminal real en una Raspberry Pi, enjaulada en Docker.',
-      subtitle: 'Este portafolio <strong>no es una página normal</strong>: es una terminal real corriendo en mi <strong>Raspberry Pi</strong>. Cada visita levanta un contenedor Docker desechable, aislado y con límites — explóralo como si fuera mi computadora.',
-      badge_sandbox: 'sandbox Docker efímero',
-      badge_nonet: 'sin acceso a red',
-      badge_ro: 'solo lectura',
-      badge_ttl: 'autodestrucción en 10 min',
-      cmd_title: 'comandos_listos — toca uno para ejecutarlo',
+      subtitle: 'Este portafolio <strong>no es una página normal</strong>: es una terminal real corriendo en mi <strong>Raspberry Pi</strong>. Cada visita levanta un contenedor Docker desechable, aislado y con límites.',
+      cmd_title: 'comandos_listos — toca uno',
       d_ls: 'listar archivos',
       d_about: 'quién soy',
       d_projects: 'entrar a mis proyectos',
       d_tree: 'ver toda la estructura',
       d_skills: 'skills y stack',
       d_contact: 'cómo contactarme',
-      note: 'También puedes escribir directamente en la terminal (bash real). La sesión dura 10 minutos. Rompe lo que quieras: el sandbox se autodestruye. 😉',
-      d_sign: '✍ deja tu firma (escribe y Enter)',
       d_guestbook: 'lee las firmas de otros',
-      gb_title: 'libro_de_visitas — firmas de la comunidad',
-      gb_hint: 'Firma desde la terminal: escribe firmar seguido de tu mensaje (máx 140 caracteres, una firma por sesión). Aparece aquí y dentro del sandbox al instante.',
+      d_sign: 'deja tu firma (escribe y Enter)',
+      note: 'También puedes escribir directamente en la terminal (bash real). La sesión dura 10 minutos. Rompe lo que quieras: el sandbox se autodestruye. 😉',
+      gb_title: 'guestbook — firmas de la comunidad',
+      gb_hint: 'Escribe tu mensaje y baja la palanca — o firma desde la terminal con: firmar tu mensaje (máx 140 caracteres, una firma por sesión).',
       gb_empty: 'Aún no hay firmas. ¡Sé la primera persona en dejar su huella!',
+      gb_input_ph: 'Tu mensaje para el muro… (máx 140)',
       status_connecting: 'Conectando…',
-      status_connected: '<span class="ok">● Conectado</span> — sesión aislada iniciada',
-      status_disconnected: '<span class="err">● Desconectado</span>',
-      status_error: '<span class="err">● Error de conexión</span>',
+      status_connected: '<span class="ok">CONECTADO</span> — sesión aislada',
+      status_disconnected: '<span class="err">DESCONECTADO</span>',
+      status_error: '<span class="err">ERROR DE CONEXIÓN</span>',
       reconnect: '↻ Nueva sesión',
       contact: 'Contacto',
       made_with: 'Hecho con una Raspberry Pi, Docker, Node.js, xterm.js y Cloudflare Tunnel.',
@@ -312,28 +479,25 @@
     en: {
       title: 'Gerson Rivera — Portfolio',
       meta_desc: 'Portfolio of Gerson Hernandez Rivera, Cyber Security & Software Engineer. A real terminal on a Raspberry Pi, sandboxed in Docker.',
-      subtitle: 'This portfolio is <strong>not a normal webpage</strong>: it is a real terminal running on my <strong>Raspberry Pi</strong>. Every visit spins up a disposable, isolated Docker container with hard limits — explore it as if it were my computer.',
-      badge_sandbox: 'ephemeral Docker sandbox',
-      badge_nonet: 'no network access',
-      badge_ro: 'read-only filesystem',
-      badge_ttl: 'self-destructs in 10 min',
-      cmd_title: 'ready_to_run — tap one to execute it',
+      subtitle: 'This portfolio is <strong>not a normal webpage</strong>: it is a real terminal running on my <strong>Raspberry Pi</strong>. Every visit spins up a disposable, isolated Docker container with hard limits.',
+      cmd_title: 'ready_to_run — tap one',
       d_ls: 'list files',
       d_about: 'who I am',
       d_projects: 'browse my projects',
       d_tree: 'see the whole structure',
       d_skills: 'skills & stack',
       d_contact: 'how to reach me',
-      note: 'You can also type directly in the terminal (real bash). Sessions last 10 minutes. Break whatever you want: the sandbox self-destructs. 😉',
-      d_sign: '✍ leave your mark (type & Enter)',
       d_guestbook: 'read what others left',
+      d_sign: 'leave your mark (type & Enter)',
+      note: 'You can also type directly in the terminal (real bash). Sessions last 10 minutes. Break whatever you want: the sandbox self-destructs. 😉',
       gb_title: 'guestbook — signed by the community',
-      gb_hint: 'Sign from the terminal: type sign followed by your message (max 140 chars, one signature per session). It shows up here and inside the sandbox instantly.',
+      gb_hint: 'Type your message and flip the switch — or sign from the terminal with: sign your message (max 140 chars, one signature per session).',
       gb_empty: 'No signatures yet. Be the first to leave your mark!',
+      gb_input_ph: 'Your message for the wall… (max 140)',
       status_connecting: 'Connecting…',
-      status_connected: '<span class="ok">● Connected</span> — isolated session started',
-      status_disconnected: '<span class="err">● Disconnected</span>',
-      status_error: '<span class="err">● Connection error</span>',
+      status_connected: '<span class="ok">CONNECTED</span> — isolated session',
+      status_disconnected: '<span class="err">DISCONNECTED</span>',
+      status_error: '<span class="err">CONNECTION ERROR</span>',
       reconnect: '↻ New session',
       contact: 'Contact',
       made_with: 'Built with a Raspberry Pi, Docker, Node.js, xterm.js and Cloudflare Tunnel.',
@@ -341,61 +505,59 @@
     pt: {
       title: 'Gerson Rivera — Portfólio',
       meta_desc: 'Portfólio de Gerson Hernandez Rivera, Cyber Security & Software Engineer. Um terminal real em um Raspberry Pi, isolado em Docker.',
-      subtitle: 'Este portfólio <strong>não é uma página normal</strong>: é um terminal real rodando no meu <strong>Raspberry Pi</strong>. Cada visita cria um contêiner Docker descartável, isolado e com limites — explore como se fosse o meu computador.',
-      badge_sandbox: 'sandbox Docker efêmero',
-      badge_nonet: 'sem acesso à rede',
-      badge_ro: 'somente leitura',
-      badge_ttl: 'autodestruição em 10 min',
-      cmd_title: 'comandos_prontos — toque em um para executar',
+      subtitle: 'Este portfólio <strong>não é uma página normal</strong>: é um terminal real rodando no meu <strong>Raspberry Pi</strong>. Cada visita cria um contêiner Docker descartável, isolado e com limites.',
+      cmd_title: 'comandos_prontos — toque em um',
       d_ls: 'listar arquivos',
       d_about: 'quem eu sou',
       d_projects: 'entrar nos meus projetos',
       d_tree: 'ver toda a estrutura',
       d_skills: 'skills e stack',
       d_contact: 'como falar comigo',
-      note: 'Você também pode digitar direto no terminal (bash real). A sessão dura 10 minutos. Quebre o que quiser: o sandbox se autodestrói. 😉',
-      d_sign: '✍ deixe sua marca (digite e Enter)',
       d_guestbook: 'leia o que outros deixaram',
+      d_sign: 'deixe sua marca (digite e Enter)',
+      note: 'Você também pode digitar direto no terminal (bash real). A sessão dura 10 minutos. Quebre o que quiser: o sandbox se autodestrói. 😉',
       gb_title: 'livro_de_visitas — assinado pela comunidade',
-      gb_hint: 'Assine pelo terminal: digite sign seguido da sua mensagem (máx. 140 caracteres, uma assinatura por sessão). Aparece aqui e dentro do sandbox na hora.',
+      gb_hint: 'Digite sua mensagem e acione a alavanca — ou assine pelo terminal com: sign sua mensagem (máx. 140 caracteres, uma por sessão).',
       gb_empty: 'Ainda não há assinaturas. Seja a primeira pessoa a deixar sua marca!',
+      gb_input_ph: 'Sua mensagem para o mural… (máx. 140)',
       status_connecting: 'Conectando…',
-      status_connected: '<span class="ok">● Conectado</span> — sessão isolada iniciada',
-      status_disconnected: '<span class="err">● Desconectado</span>',
-      status_error: '<span class="err">● Erro de conexão</span>',
+      status_connected: '<span class="ok">CONECTADO</span> — sessão isolada',
+      status_disconnected: '<span class="err">DESCONECTADO</span>',
+      status_error: '<span class="err">ERRO DE CONEXÃO</span>',
       reconnect: '↻ Nova sessão',
       contact: 'Contato',
       made_with: 'Feito com um Raspberry Pi, Docker, Node.js, xterm.js e Cloudflare Tunnel.',
     },
   };
 
-  // Comandos listos para usar. En EN/PT la sesión arranca en ~/english,
-  // así que los comandos apuntan a los archivos traducidos.
+  // Comandos con micro-iconos. En EN/PT la sesión arranca en ~/english.
   const COMMANDS = {
     es: [
-      { cmd: 'ls', k: 'd_ls' },
-      { cmd: 'cat sobre-mi.txt', k: 'd_about' },
-      { cmd: 'cd proyectos', k: 'd_projects' },
-      { cmd: 'tree', k: 'd_tree' },
-      { cmd: 'cat habilidades.txt', k: 'd_skills' },
-      { cmd: 'cat contacto.txt', k: 'd_contact' },
-      { cmd: 'cat libro-visitas.txt', k: 'd_guestbook' },
-      { cmd: 'firmar ', k: 'd_sign', raw: true },
+      { cmd: 'ls', k: 'd_ls', ico: '🗂' },
+      { cmd: 'cat sobre-mi.txt', k: 'd_about', ico: '📄' },
+      { cmd: 'cd proyectos', k: 'd_projects', ico: '📁' },
+      { cmd: 'tree', k: 'd_tree', ico: '🌲' },
+      { cmd: 'cat habilidades.txt', k: 'd_skills', ico: '⚡' },
+      { cmd: 'cat contacto.txt', k: 'd_contact', ico: '📫' },
+      { cmd: 'cat libro-visitas.txt', k: 'd_guestbook', ico: '📖' },
+      { cmd: 'firmar ', k: 'd_sign', ico: '✍️', raw: true },
     ],
     en: [
-      { cmd: 'ls', k: 'd_ls' },
-      { cmd: 'cat about-me.txt', k: 'd_about' },
-      { cmd: 'cd projects', k: 'd_projects' },
-      { cmd: 'tree', k: 'd_tree' },
-      { cmd: 'cat skills.txt', k: 'd_skills' },
-      { cmd: 'cat contact.txt', k: 'd_contact' },
-      { cmd: 'cat guestbook.txt', k: 'd_guestbook' },
-      { cmd: 'sign ', k: 'd_sign', raw: true },
+      { cmd: 'ls', k: 'd_ls', ico: '🗂' },
+      { cmd: 'cat about-me.txt', k: 'd_about', ico: '📄' },
+      { cmd: 'cd projects', k: 'd_projects', ico: '📁' },
+      { cmd: 'tree', k: 'd_tree', ico: '🌲' },
+      { cmd: 'cat skills.txt', k: 'd_skills', ico: '⚡' },
+      { cmd: 'cat contact.txt', k: 'd_contact', ico: '📫' },
+      { cmd: 'cat guestbook.txt', k: 'd_guestbook', ico: '📖' },
+      { cmd: 'sign ', k: 'd_sign', ico: '✍️', raw: true },
     ],
   };
   COMMANDS.pt = COMMANDS.en;
 
   const statusEl = document.getElementById('status');
+  const status2El = document.getElementById('status2');
+  const ledEl = document.getElementById('led');
   const timerEl = document.getElementById('timer');
   const reconnectBtn = document.getElementById('reconnect');
   const cmdsEl = document.getElementById('cmds');
@@ -412,25 +574,31 @@
   function setStatus(key) {
     lastStatus = key;
     statusEl.innerHTML = t('status_' + key);
+    status2El.innerHTML = t('status_' + key);
+    ledEl.className = 'led' + (key === 'connected' ? '' : key === 'connecting' ? ' warn' : ' err');
   }
 
   function renderCmds() {
     cmdsEl.innerHTML = '';
-    COMMANDS[lang].forEach(({ cmd, k, raw }) => {
+    COMMANDS[lang].forEach(({ cmd, k, ico, raw }) => {
       const btn = document.createElement('button');
       btn.className = 'cmd-btn';
       btn.type = 'button';
+      const icon = document.createElement('span');
+      icon.className = 'ico';
+      icon.textContent = ico;
+      const body = document.createElement('span');
       const c = document.createElement('span');
       c.className = 'c';
       c.textContent = raw ? cmd + '…' : cmd;
       const d = document.createElement('span');
       d.className = 'd';
       d.textContent = t(k);
-      btn.append(c, d);
+      body.append(c, d);
+      btn.append(icon, body);
       btn.addEventListener('click', () => {
         if (ws && ws.readyState === WebSocket.OPEN) {
-          // raw: deja el comando escrito para que el visitante lo complete
-          ws.send(raw ? cmd : cmd + '\r');
+          ws.send(raw ? cmd : cmd + '\r'); // raw: deja el comando escrito para completar
           term.focus();
           document.querySelector('.term-window').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
@@ -445,9 +613,8 @@
     document.documentElement.lang = l;
     document.title = t('title');
     document.getElementById('meta-desc').setAttribute('content', t('meta_desc'));
-    document.querySelectorAll('[data-i18n]').forEach((el) => {
-      el.innerHTML = t(el.dataset.i18n);
-    });
+    document.querySelectorAll('[data-i18n]').forEach((el) => { el.innerHTML = t(el.dataset.i18n); });
+    document.querySelectorAll('[data-i18n-ph]').forEach((el) => { el.placeholder = t(el.dataset.i18nPh); });
     renderCmds();
     renderGbook();
     reconnectBtn.textContent = t('reconnect');
@@ -456,13 +623,57 @@
       b.classList.toggle('active', b.dataset.lang === l);
     });
   }
-
   document.querySelectorAll('.lang-switch button').forEach((b) => {
     b.addEventListener('click', () => setLang(b.dataset.lang));
   });
 
-  // ---------- libro de visitas ----------
+  // ---------- medidores CPU/RAM (decorativos: especificaciones del sandbox) ----------
+  const CIRC = 150.8;
+  function setGauge(id, pct) {
+    document.getElementById(id).style.strokeDashoffset = CIRC * (1 - pct / 100);
+    document.getElementById(id + '-t').textContent = Math.round(pct) + '%';
+  }
+  let cpuV = 18, ramV = 34;
+  function tickGauges() {
+    cpuV = Math.min(88, Math.max(6, cpuV + (Math.random() - 0.5) * 14));
+    ramV = Math.min(80, Math.max(22, ramV + (Math.random() - 0.5) * 8));
+    setGauge('g-cpu', cpuV);
+    setGauge('g-ram', ramV);
+  }
+  tickGauges();
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    setInterval(tickGauges, 2200);
+  }
+
+  // ---------- guestbook ----------
   let gbData = null;
+
+  // avatar pixel-art determinista (5x5 espejado) a partir del mensaje
+  function identicon(str) {
+    let h = 5381;
+    for (let i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) >>> 0;
+    const hue = 150 + (h % 70); // gama cian/verde
+    const svgNS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(svgNS, 'svg');
+    svg.setAttribute('width', '34'); svg.setAttribute('height', '34');
+    svg.setAttribute('viewBox', '0 0 5 5'); svg.classList.add('gb-avatar');
+    let bits = h;
+    for (let x = 0; x < 3; x++) {
+      for (let y = 0; y < 5; y++) {
+        bits = (bits * 1103515245 + 12345) >>> 0;
+        if (bits % 3 !== 0) continue;
+        for (const px of x === 2 ? [2] : [x, 4 - x]) {
+          const r = document.createElementNS(svgNS, 'rect');
+          r.setAttribute('x', px); r.setAttribute('y', y);
+          r.setAttribute('width', 1); r.setAttribute('height', 1);
+          r.setAttribute('fill', `hsl(${hue} 90% ${45 + (bits % 20)}%)`);
+          svg.appendChild(r);
+        }
+      }
+    }
+    return svg;
+  }
+
   function renderGbook() {
     const el = document.getElementById('gbook');
     el.innerHTML = '';
@@ -476,6 +687,7 @@
     gbData.forEach((e) => {
       const item = document.createElement('div');
       item.className = 'gb-item';
+      const body = document.createElement('div');
       const msg = document.createElement('span');
       msg.className = 'gb-msg';
       // textContent SIEMPRE: contenido de usuarios anónimos, nunca innerHTML
@@ -483,7 +695,8 @@
       const date = document.createElement('span');
       date.className = 'gb-date';
       date.textContent = (e.ts || '').slice(0, 10);
-      item.append(msg, date);
+      body.append(msg, date);
+      item.append(identicon(e.msg + (e.ts || '')), body);
       el.appendChild(item);
     });
   }
@@ -496,31 +709,39 @@
   setInterval(loadGbook, 60000);
   loadGbook();
 
-  // ---------- efecto de tipeo del rol ----------
-  const ROLE = 'Cyber Security & Software Engineer — Drogheda, IE';
-  const typedEl = document.getElementById('typed-text');
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    typedEl.textContent = ROLE;
-  } else {
-    let ti = 0;
-    (function type() {
-      typedEl.textContent = ROLE.slice(0, ti++);
-      if (ti <= ROLE.length) setTimeout(type, 35 + Math.random() * 45);
-    })();
-  }
+  // palanca: envía la firma por la MISMA vía que la terminal (ws -> servidor)
+  const gbInput = document.getElementById('gb-input');
+  const gbToggle = document.getElementById('gb-toggle');
+  gbToggle.addEventListener('change', () => {
+    if (!gbToggle.checked) return;
+    const msg = gbInput.value.trim();
+    if (msg && ws && ws.readyState === WebSocket.OPEN) {
+      ws.send((lang === 'es' ? 'firmar ' : 'sign ') + msg + '\r');
+      gbInput.value = '';
+      term.focus();
+      setTimeout(loadGbook, 800);
+    } else {
+      gbInput.classList.add('shake');
+      setTimeout(() => gbInput.classList.remove('shake'), 350);
+    }
+    setTimeout(() => { gbToggle.checked = false; }, 650);
+  });
+  gbInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { gbToggle.checked = true; gbToggle.dispatchEvent(new Event('change')); }
+  });
 
   // ---------- Terminal ----------
   const SESSION_MS = 10 * 60 * 1000;
-  const isSmall = window.matchMedia('(max-width: 600px)').matches;
+  const isSmall = window.matchMedia('(max-width: 760px)').matches;
   const term = new Terminal({
     cursorBlink: true,
     fontSize: isSmall ? 13 : 14,
     fontFamily: '"SF Mono", "Fira Code", Menlo, Consolas, monospace',
     theme: {
-      background: '#0a0e14',
-      foreground: '#e6edf3',
-      cursor: '#58e6a8',
-      selectionBackground: '#2d4f3f',
+      background: '#050807',
+      foreground: '#45f376',
+      cursor: '#00e5ff',
+      selectionBackground: '#134d33',
     },
   });
   const fitAddon = new FitAddon.FitAddon();
@@ -538,15 +759,11 @@
       const left = Math.max(0, end - Date.now());
       const m = Math.floor(left / 60000);
       const s = Math.floor((left % 60000) / 1000);
-      timerEl.textContent = `⏱ ${m}:${String(s).padStart(2, '0')}`;
+      timerEl.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}m`;
       if (left <= 0) clearInterval(timerInterval);
     }, 1000);
   }
-
-  function stopTimer() {
-    clearInterval(timerInterval);
-    timerEl.textContent = '';
-  }
+  function stopTimer() { clearInterval(timerInterval); timerEl.textContent = '--:--'; }
 
   function sendResize() {
     if (ws && ws.readyState === WebSocket.OPEN) {
@@ -556,15 +773,13 @@
 
   function connect() {
     const proto = location.protocol === 'https:' ? 'wss' : 'ws';
-    // El idioma elegido viaja al servidor, que se lo pasa al contenedor
     ws = new WebSocket(`${proto}://${location.host}/terminal?lang=${lang}`);
-
     ws.onopen = () => {
       setStatus('connected');
       reconnectBtn.style.display = 'none';
       startTimer();
       sendResize();
-      if (!isSmall) term.focus(); // en móvil no abrir el teclado de golpe
+      if (!isSmall) term.focus();
     };
     ws.onmessage = (e) => term.write(e.data);
     ws.onclose = () => {
@@ -582,7 +797,6 @@
   term.onData((data) => {
     if (ws && ws.readyState === WebSocket.OPEN) ws.send(data);
   });
-
   reconnectBtn.addEventListener('click', () => {
     term.reset();
     setStatus('connecting');
@@ -592,10 +806,7 @@
   let resizeRaf = null;
   window.addEventListener('resize', () => {
     cancelAnimationFrame(resizeRaf);
-    resizeRaf = requestAnimationFrame(() => {
-      fitAddon.fit();
-      sendResize();
-    });
+    resizeRaf = requestAnimationFrame(() => { fitAddon.fit(); sendResize(); });
   });
 
   setLang(lang);
