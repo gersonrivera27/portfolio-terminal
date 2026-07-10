@@ -181,7 +181,7 @@
   .gauge label { font-size: .6rem; letter-spacing: .2em; color: var(--muted); }
 
   .clock { display: flex; align-items: center; gap: .45rem; font-size: .95rem; color: var(--led); text-shadow: 0 0 8px var(--led-dim); font-variant-numeric: tabular-nums; }
-  .clock .ico { font-size: .85rem; }
+  .clock .ico svg { width: 15px; height: 15px; display: block; }
 
   /* ============ consola principal ============ */
   .console-grid { display: grid; grid-template-columns: 300px 1fr; gap: 1.1rem; }
@@ -211,7 +211,9 @@
     transform: translateY(1px);
     box-shadow: inset 3px 3px 8px rgba(0, 0, 0, .7);
   }
-  .cmd-btn .ico { font-size: .85rem; line-height: 1.4; filter: grayscale(.25); }
+  .cmd-btn .ico { color: var(--neon); opacity: .8; margin-top: .1rem; }
+  .cmd-btn .ico svg { width: 15px; height: 15px; display: block; }
+  .cmd-btn:hover .ico { opacity: 1; filter: drop-shadow(0 0 4px var(--neon-dim)); }
   .cmd-btn .c { display: block; color: var(--neon); font-weight: 600; font-size: .8rem; transition: text-shadow .15s; }
   .cmd-btn .c::before { content: '$ '; color: var(--muted); font-weight: 400; }
   .cmd-btn .d { display: block; color: var(--muted); font-size: .68rem; margin-top: .2rem; }
@@ -306,6 +308,8 @@
   .toggle-label { font-size: .62rem; letter-spacing: .15em; color: var(--muted); text-align: center; display: block; margin-top: .3rem; }
 
   footer { color: var(--muted); font-size: .8rem; line-height: 1.9; padding: 0 .4rem; }
+  .ficon { display: inline-block; vertical-align: -2px; margin-right: .45rem; color: var(--neon); opacity: .75; }
+  .ficon svg { width: 14px; height: 14px; display: block; }
   footer a { color: var(--neon); text-decoration: none; }
   footer a:hover { text-decoration: underline; text-shadow: 0 0 8px var(--neon-dim); }
 
@@ -375,7 +379,7 @@
           <label>RAM</label>
         </div>
       </div>
-      <div class="clock"><span class="ico">⏱</span><span id="timer">--:--</span></div>
+      <div class="clock"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><span id="timer">--:--</span></div>
     </div>
   </section>
 
@@ -438,10 +442,10 @@
   </noscript>
 
   <footer>
-    <div>📫 <span data-i18n="contact"></span>: <a href="mailto:gersonrivera02@icloud.com">gersonrivera02@icloud.com</a>
+    <div><span class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22,6 12,13 2,6"/></svg></span><span data-i18n="contact"></span>: <a href="mailto:gersonrivera02@icloud.com">gersonrivera02@icloud.com</a>
       · <a href="https://github.com/gersonrivera27" target="_blank" rel="noopener">GitHub</a>
       · <a href="https://linkedin.com/in/gersonhernandezz" target="_blank" rel="noopener">LinkedIn</a></div>
-    <div>⚙️ <span data-i18n="made_with"></span></div>
+    <div><span class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg></span><span data-i18n="made_with"></span></div>
   </footer>
 </div>
 
@@ -463,7 +467,7 @@
       d_contact: 'cómo contactarme',
       d_guestbook: 'lee las firmas de otros',
       d_sign: 'deja tu firma (escribe y Enter)',
-      note: 'También puedes escribir directamente en la terminal (bash real). La sesión dura 10 minutos. Rompe lo que quieras: el sandbox se autodestruye. 😉',
+      note: 'También puedes escribir directamente en la terminal (bash real). La sesión dura 10 minutos. Rompe lo que quieras: el sandbox se autodestruye.',
       gb_title: 'guestbook — firmas de la comunidad',
       gb_hint: 'Escribe tu mensaje y baja la palanca — o firma desde la terminal con: firmar tu mensaje (máx 140 caracteres, una firma por sesión).',
       gb_empty: 'Aún no hay firmas. ¡Sé la primera persona en dejar su huella!',
@@ -489,7 +493,7 @@
       d_contact: 'how to reach me',
       d_guestbook: 'read what others left',
       d_sign: 'leave your mark (type & Enter)',
-      note: 'You can also type directly in the terminal (real bash). Sessions last 10 minutes. Break whatever you want: the sandbox self-destructs. 😉',
+      note: 'You can also type directly in the terminal (real bash). Sessions last 10 minutes. Break whatever you want: the sandbox self-destructs.',
       gb_title: 'guestbook — signed by the community',
       gb_hint: 'Type your message and flip the switch — or sign from the terminal with: sign your message (max 140 chars, one signature per session).',
       gb_empty: 'No signatures yet. Be the first to leave your mark!',
@@ -515,7 +519,7 @@
       d_contact: 'como falar comigo',
       d_guestbook: 'leia o que outros deixaram',
       d_sign: 'deixe sua marca (digite e Enter)',
-      note: 'Você também pode digitar direto no terminal (bash real). A sessão dura 10 minutos. Quebre o que quiser: o sandbox se autodestrói. 😉',
+      note: 'Você também pode digitar direto no terminal (bash real). A sessão dura 10 minutos. Quebre o que quiser: o sandbox se autodestrói.',
       gb_title: 'livro_de_visitas — assinado pela comunidade',
       gb_hint: 'Digite sua mensagem e acione a alavanca — ou assine pelo terminal com: sign sua mensagem (máx. 140 caracteres, uma por sessão).',
       gb_empty: 'Ainda não há assinaturas. Seja a primeira pessoa a deixar sua marca!',
@@ -530,27 +534,43 @@
     },
   };
 
-  // Comandos con micro-iconos. En EN/PT la sesión arranca en ~/english.
+  // Iconos SVG inline (trazo, currentColor) — sin emojis en la UI.
+  const SVG = (body) =>
+    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${body}</svg>`;
+  const ICONS = {
+    list: SVG('<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>'),
+    file: SVG('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>'),
+    folder: SVG('<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>'),
+    tree: SVG('<line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/>'),
+    zap: SVG('<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>'),
+    mail: SVG('<rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22,6 12,13 2,6"/>'),
+    book: SVG('<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>'),
+    pen: SVG('<path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>'),
+    clock: SVG('<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>'),
+    cpu: SVG('<rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/>'),
+  };
+
+  // Comandos con micro-iconos SVG. En EN/PT la sesión arranca en ~/english.
   const COMMANDS = {
     es: [
-      { cmd: 'ls', k: 'd_ls', ico: '🗂' },
-      { cmd: 'cat sobre-mi.txt', k: 'd_about', ico: '📄' },
-      { cmd: 'cd proyectos', k: 'd_projects', ico: '📁' },
-      { cmd: 'tree', k: 'd_tree', ico: '🌲' },
-      { cmd: 'cat habilidades.txt', k: 'd_skills', ico: '⚡' },
-      { cmd: 'cat contacto.txt', k: 'd_contact', ico: '📫' },
-      { cmd: 'cat libro-visitas.txt', k: 'd_guestbook', ico: '📖' },
-      { cmd: 'firmar ', k: 'd_sign', ico: '✍️', raw: true },
+      { cmd: 'ls', k: 'd_ls', ico: 'list' },
+      { cmd: 'cat sobre-mi.txt', k: 'd_about', ico: 'file' },
+      { cmd: 'cd proyectos', k: 'd_projects', ico: 'folder' },
+      { cmd: 'tree', k: 'd_tree', ico: 'tree' },
+      { cmd: 'cat habilidades.txt', k: 'd_skills', ico: 'zap' },
+      { cmd: 'cat contacto.txt', k: 'd_contact', ico: 'mail' },
+      { cmd: 'cat libro-visitas.txt', k: 'd_guestbook', ico: 'book' },
+      { cmd: 'firmar ', k: 'd_sign', ico: 'pen', raw: true },
     ],
     en: [
-      { cmd: 'ls', k: 'd_ls', ico: '🗂' },
-      { cmd: 'cat about-me.txt', k: 'd_about', ico: '📄' },
-      { cmd: 'cd projects', k: 'd_projects', ico: '📁' },
-      { cmd: 'tree', k: 'd_tree', ico: '🌲' },
-      { cmd: 'cat skills.txt', k: 'd_skills', ico: '⚡' },
-      { cmd: 'cat contact.txt', k: 'd_contact', ico: '📫' },
-      { cmd: 'cat guestbook.txt', k: 'd_guestbook', ico: '📖' },
-      { cmd: 'sign ', k: 'd_sign', ico: '✍️', raw: true },
+      { cmd: 'ls', k: 'd_ls', ico: 'list' },
+      { cmd: 'cat about-me.txt', k: 'd_about', ico: 'file' },
+      { cmd: 'cd projects', k: 'd_projects', ico: 'folder' },
+      { cmd: 'tree', k: 'd_tree', ico: 'tree' },
+      { cmd: 'cat skills.txt', k: 'd_skills', ico: 'zap' },
+      { cmd: 'cat contact.txt', k: 'd_contact', ico: 'mail' },
+      { cmd: 'cat guestbook.txt', k: 'd_guestbook', ico: 'book' },
+      { cmd: 'sign ', k: 'd_sign', ico: 'pen', raw: true },
     ],
   };
   COMMANDS.pt = COMMANDS.en;
@@ -586,7 +606,7 @@
       btn.type = 'button';
       const icon = document.createElement('span');
       icon.className = 'ico';
-      icon.textContent = ico;
+      icon.innerHTML = ICONS[ico]; // SVG estático propio, nunca contenido de usuario
       const body = document.createElement('span');
       const c = document.createElement('span');
       c.className = 'c';
