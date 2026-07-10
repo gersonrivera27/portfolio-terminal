@@ -1,0 +1,45 @@
+# Stack de observabilidad para el portafolio (dimensionado para Raspberry Pi).
+# Uso:  cd observability && docker compose up -d
+# Grafana queda en http://IP-DE-LA-PI:3001 (Loki no se expone al host).
+services:
+  loki:
+    image: grafana/loki:3.1.1
+    command: -config.file=/etc/loki/loki.yml
+    volumes:
+      - ./loki-config.yml:/etc/loki/loki.yml:ro
+      - loki-data:/loki
+    restart: unless-stopped
+
+  promtail:
+    image: grafana/promtail:3.1.1
+    command: -config.file=/etc/promtail/promtail.yml
+    volumes:
+      - ./promtail-config.yml:/etc/promtail/promtail.yml:ro
+      # logs del portafolio, solo lectura
+      - ../server/logs:/var/log/portfolio:ro
+      - promtail-positions:/positions
+    depends_on:
+      - loki
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana-oss:11.3.0
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=gerson
+      # CAMBIA esta contraseña antes del primer arranque:
+      - GF_SECURITY_ADMIN_PASSWORD=cambiame-ya
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_ANALYTICS_REPORTING_ENABLED=false
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana-provisioning:/etc/grafana/provisioning:ro
+    depends_on:
+      - loki
+    restart: unless-stopped
+
+volumes:
+  loki-data:
+  promtail-positions:
+  grafana-data:

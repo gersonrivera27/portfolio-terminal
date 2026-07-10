@@ -28,7 +28,27 @@ Visitante ──HTTPS──> Cloudflare Tunnel ──> Raspberry Pi
 
 ## Log de sesiones (honeypot-style)
 
-Cada sesión y cada comando ejecutado por un visitante se registra en `server/logs/sessions.jsonl` como JSON por línea (`ts`, `event`, `ip`, `session`, `cmd`), filtrando las secuencias de escape del teclado (flechas, etc.). El formato es directamente ingerible con Promtail/Loki, así que puedes sumarlo como fuente en tu stack de Grafana igual que el honeypot Cowrie.
+Cada sesión y cada comando ejecutado por un visitante se registra en `server/logs/sessions.jsonl` como JSON por línea (`ts`, `event`, `ip`, `session`, `cmd`, `lang`), filtrando las secuencias de escape del teclado (flechas, etc.).
+
+## Observabilidad (Grafana + Loki + Promtail)
+
+En `observability/` hay un stack completo dimensionado para la Pi (retención de
+30 días, Loki sin puerto expuesto, Grafana en el 3001):
+
+```bash
+cd observability
+# cambia GF_SECURITY_ADMIN_PASSWORD en docker-compose.yml primero
+docker compose up -d
+# Grafana: http://IP-DE-LA-PI:3001 (datasource Loki ya provisionado)
+```
+
+Consultas LogQL útiles (Explore → Loki):
+
+```logql
+{job="portfolio-terminal"}                                  # todo
+{job="portfolio-terminal", event="command"} | json | line_format "{{.ip}} $ {{.cmd}}"
+sum by (lang) (count_over_time({job="portfolio-terminal", event="session_start"}[1d]))
+```
 
 ## Estructura del proyecto
 
