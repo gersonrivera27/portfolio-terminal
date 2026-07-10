@@ -19,6 +19,12 @@ RUN printf '%s\n' \
     'esac' \
     > /etc/profile.d/prompt.sh
 
+# Stub de 'firmar'/'sign': el registro real lo hace el SERVIDOR interceptando
+# el comando desde el WebSocket; este script solo evita el "command not found".
+RUN printf '#!/bin/sh\nexit 0\n' > /usr/local/bin/firmar \
+    && chmod +x /usr/local/bin/firmar \
+    && ln -s /usr/local/bin/firmar /usr/local/bin/sign
+
 USER visitante
 WORKDIR /home/visitante
 ENV HOME=/home/visitante ENV=/etc/profile.d/prompt.sh

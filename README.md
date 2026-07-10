@@ -30,6 +30,18 @@ Visitante ──HTTPS──> Cloudflare Tunnel ──> Raspberry Pi
 
 Cada sesión y cada comando ejecutado por un visitante se registra en `server/logs/sessions.jsonl` como JSON por línea (`ts`, `event`, `ip`, `session`, `cmd`, `lang`), filtrando las secuencias de escape del teclado (flechas, etc.).
 
+## Libro de visitas
+
+El visitante firma **desde la terminal**: `firmar <mensaje>` (o `sign` en EN/PT).
+El comando lo intercepta el servidor desde el stream del WebSocket — el sandbox
+sigue sin red y sin escritura; dentro solo hay un stub silencioso. El mensaje se
+sanitiza (sin caracteres de control, máx 140), con límites de 1 firma por sesión
+y 3 por IP al día. Las firmas viven en `server/logs/guestbook.jsonl`, se
+renderizan a `server/data/libro-visitas.txt` (montado solo-lectura en cada
+sandbox como `~/libro-visitas.txt` y `~/english/guestbook.txt`) y se muestran en
+la web vía `GET /api/guestbook` (sin IPs, render con `textContent` → sin XSS).
+Moderación: borra la línea del `guestbook.jsonl` y reinicia (o edita y reinicia).
+
 ## Observabilidad (Grafana + Loki + Promtail)
 
 En `observability/` hay un stack completo dimensionado para la Pi (retención de

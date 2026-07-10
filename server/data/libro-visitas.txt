@@ -1,0 +1,9 @@
+╔═══════════════════════════════════════════════════╗
+║         Libro de visitas  ·  Guestbook            ║
+╚═══════════════════════════════════════════════════╝
+
+Firma con:  firmar <tu mensaje>     (una por sesión)
+Sign with:  sign <your message>     (one per session)
+
+─────────────────────────────────────────────────────
+(todavía no hay firmas — sé el primero / be the first)

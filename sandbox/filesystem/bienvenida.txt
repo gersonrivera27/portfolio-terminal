@@ -14,4 +14,7 @@ Comandos útiles:
 
 Empieza con:  cat sobre-mi.txt o cd proyectos
 
+Deja tu huella:  firmar tu mensaje aquí
+Lee las firmas:  cat libro-visitas.txt
+
 English? → cd english  (everything is translated there)

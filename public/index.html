@@ -132,6 +132,20 @@
   .cmd-btn .d { display: block; color: var(--muted); font-size: .72rem; margin-top: .25rem; }
   .note { color: var(--muted); font-size: .78rem; margin: .7rem 0 1.2rem; line-height: 1.6; }
 
+  /* ---- libro de visitas ---- */
+  .gbook {
+    display: grid; gap: .5rem;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+  .gb-item {
+    background: var(--panel); border: 1px solid var(--border);
+    border-left: 3px solid var(--accent); border-radius: 8px;
+    padding: .6rem .8rem; display: flex; flex-direction: column; gap: .3rem;
+  }
+  .gb-msg { color: var(--text); font-size: .85rem; line-height: 1.5; overflow-wrap: anywhere; }
+  .gb-date { color: var(--muted); font-size: .7rem; }
+  .gb-empty { color: var(--muted); font-size: .85rem; }
+
   /* ---- terminal ---- */
   .term-window {
     position: relative;
@@ -237,6 +251,10 @@
     <button id="reconnect"></button>
   </div>
 
+  <div class="sec-label"><span class="hash">##</span> <span data-i18n="gb_title"></span></div>
+  <div class="gbook" id="gbook" aria-live="polite"></div>
+  <p class="note" data-i18n="gb_hint"></p>
+
   <noscript>
     <p style="margin-top:1.5rem; line-height:1.7;">
       Este portafolio necesita JavaScript para la terminal interactiva. /
@@ -278,6 +296,11 @@
       d_skills: 'skills y stack',
       d_contact: 'cómo contactarme',
       note: 'También puedes escribir directamente en la terminal (bash real). La sesión dura 10 minutos. Rompe lo que quieras: el sandbox se autodestruye. 😉',
+      d_sign: '✍ deja tu firma (escribe y Enter)',
+      d_guestbook: 'lee las firmas de otros',
+      gb_title: 'libro_de_visitas — firmas de la comunidad',
+      gb_hint: 'Firma desde la terminal: escribe firmar seguido de tu mensaje (máx 140 caracteres, una firma por sesión). Aparece aquí y dentro del sandbox al instante.',
+      gb_empty: 'Aún no hay firmas. ¡Sé la primera persona en dejar su huella!',
       status_connecting: 'Conectando…',
       status_connected: '<span class="ok">● Conectado</span> — sesión aislada iniciada',
       status_disconnected: '<span class="err">● Desconectado</span>',
@@ -302,6 +325,11 @@
       d_skills: 'skills & stack',
       d_contact: 'how to reach me',
       note: 'You can also type directly in the terminal (real bash). Sessions last 10 minutes. Break whatever you want: the sandbox self-destructs. 😉',
+      d_sign: '✍ leave your mark (type & Enter)',
+      d_guestbook: 'read what others left',
+      gb_title: 'guestbook — signed by the community',
+      gb_hint: 'Sign from the terminal: type sign followed by your message (max 140 chars, one signature per session). It shows up here and inside the sandbox instantly.',
+      gb_empty: 'No signatures yet. Be the first to leave your mark!',
       status_connecting: 'Connecting…',
       status_connected: '<span class="ok">● Connected</span> — isolated session started',
       status_disconnected: '<span class="err">● Disconnected</span>',
@@ -326,6 +354,11 @@
       d_skills: 'skills e stack',
       d_contact: 'como falar comigo',
       note: 'Você também pode digitar direto no terminal (bash real). A sessão dura 10 minutos. Quebre o que quiser: o sandbox se autodestrói. 😉',
+      d_sign: '✍ deixe sua marca (digite e Enter)',
+      d_guestbook: 'leia o que outros deixaram',
+      gb_title: 'livro_de_visitas — assinado pela comunidade',
+      gb_hint: 'Assine pelo terminal: digite sign seguido da sua mensagem (máx. 140 caracteres, uma assinatura por sessão). Aparece aqui e dentro do sandbox na hora.',
+      gb_empty: 'Ainda não há assinaturas. Seja a primeira pessoa a deixar sua marca!',
       status_connecting: 'Conectando…',
       status_connected: '<span class="ok">● Conectado</span> — sessão isolada iniciada',
       status_disconnected: '<span class="err">● Desconectado</span>',
@@ -346,6 +379,8 @@
       { cmd: 'tree', k: 'd_tree' },
       { cmd: 'cat habilidades.txt', k: 'd_skills' },
       { cmd: 'cat contacto.txt', k: 'd_contact' },
+      { cmd: 'cat libro-visitas.txt', k: 'd_guestbook' },
+      { cmd: 'firmar ', k: 'd_sign', raw: true },
     ],
     en: [
       { cmd: 'ls', k: 'd_ls' },
@@ -354,6 +389,8 @@
       { cmd: 'tree', k: 'd_tree' },
       { cmd: 'cat skills.txt', k: 'd_skills' },
       { cmd: 'cat contact.txt', k: 'd_contact' },
+      { cmd: 'cat guestbook.txt', k: 'd_guestbook' },
+      { cmd: 'sign ', k: 'd_sign', raw: true },
     ],
   };
   COMMANDS.pt = COMMANDS.en;
@@ -379,20 +416,21 @@
 
   function renderCmds() {
     cmdsEl.innerHTML = '';
-    COMMANDS[lang].forEach(({ cmd, k }) => {
+    COMMANDS[lang].forEach(({ cmd, k, raw }) => {
       const btn = document.createElement('button');
       btn.className = 'cmd-btn';
       btn.type = 'button';
       const c = document.createElement('span');
       c.className = 'c';
-      c.textContent = cmd;
+      c.textContent = raw ? cmd + '…' : cmd;
       const d = document.createElement('span');
       d.className = 'd';
       d.textContent = t(k);
       btn.append(c, d);
       btn.addEventListener('click', () => {
         if (ws && ws.readyState === WebSocket.OPEN) {
-          ws.send(cmd + '\r');
+          // raw: deja el comando escrito para que el visitante lo complete
+          ws.send(raw ? cmd : cmd + '\r');
           term.focus();
           document.querySelector('.term-window').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
@@ -411,6 +449,7 @@
       el.innerHTML = t(el.dataset.i18n);
     });
     renderCmds();
+    renderGbook();
     reconnectBtn.textContent = t('reconnect');
     setStatus(lastStatus);
     document.querySelectorAll('.lang-switch button').forEach((b) => {
@@ -421,6 +460,41 @@
   document.querySelectorAll('.lang-switch button').forEach((b) => {
     b.addEventListener('click', () => setLang(b.dataset.lang));
   });
+
+  // ---------- libro de visitas ----------
+  let gbData = null;
+  function renderGbook() {
+    const el = document.getElementById('gbook');
+    el.innerHTML = '';
+    if (!gbData || !gbData.length) {
+      const p = document.createElement('div');
+      p.className = 'gb-empty';
+      p.textContent = t('gb_empty');
+      el.appendChild(p);
+      return;
+    }
+    gbData.forEach((e) => {
+      const item = document.createElement('div');
+      item.className = 'gb-item';
+      const msg = document.createElement('span');
+      msg.className = 'gb-msg';
+      // textContent SIEMPRE: contenido de usuarios anónimos, nunca innerHTML
+      msg.textContent = '“' + e.msg + '”';
+      const date = document.createElement('span');
+      date.className = 'gb-date';
+      date.textContent = (e.ts || '').slice(0, 10);
+      item.append(msg, date);
+      el.appendChild(item);
+    });
+  }
+  function loadGbook() {
+    fetch('/api/guestbook')
+      .then((r) => (r.ok ? r.json() : []))
+      .then((d) => { gbData = d; renderGbook(); })
+      .catch(() => renderGbook());
+  }
+  setInterval(loadGbook, 60000);
+  loadGbook();
 
   // ---------- efecto de tipeo del rol ----------
   const ROLE = 'Cyber Security & Software Engineer — Drogheda, IE';

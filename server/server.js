@@ -27,6 +27,92 @@ function logEvent(event, fields) {
   fs.appendFile(LOG_FILE, JSON.stringify(entry) + '\n', () => {});
 }
 
+// ---------- Libro de visitas ----------
+// El visitante escribe `firmar <mensaje>` (o `sign`) dentro del sandbox.
+// El comando lo intercepta ESTE servidor desde el stream de teclado; el
+// contenedor solo tiene un stub silencioso. El mensaje nunca sale del
+// contenedor: nace aquí, sanitizado, con límites por sesión y por IP.
+const DATA_DIR = path.join(__dirname, 'data');
+const GUESTBOOK_LOG = path.join(LOG_DIR, 'guestbook.jsonl');
+const GUESTBOOK_FILE = path.join(DATA_DIR, 'libro-visitas.txt');
+const GB_MAX_LEN = 140;
+const GB_PER_IP_DAY = 3;
+const GB_SHOWN = 50;
+
+fs.mkdirSync(DATA_DIR, { recursive: true });
+
+let guestbook = [];
+try {
+  guestbook = fs.readFileSync(GUESTBOOK_LOG, 'utf8')
+    .split('\n').filter(Boolean)
+    .flatMap((l) => {
+      try { const e = JSON.parse(l); return e && e.msg ? [e] : []; } catch (_) { return []; }
+    });
+} catch (_) {}
+
+function renderGuestbook() {
+  const header = [
+    '╔═══════════════════════════════════════════════════╗',
+    '║         Libro de visitas  ·  Guestbook            ║',
+    '╚═══════════════════════════════════════════════════╝',
+    '',
+    'Firma con:  firmar <tu mensaje>     (una por sesión)',
+    'Sign with:  sign <your message>     (one per session)',
+    '',
+    '─────────────────────────────────────────────────────',
+  ];
+  const entries = guestbook.slice(-GB_SHOWN).reverse()
+    .map((e) => `${(e.ts || '').slice(0, 10)}  "${e.msg}"`);
+  const body = entries.length ? entries : ['(todavía no hay firmas — sé el primero / be the first)'];
+  // Escritura in-place (mismo inodo): los sandboxes ya montados ven la
+  // firma nueva al instante sin reiniciar nada.
+  fs.writeFileSync(GUESTBOOK_FILE, header.concat(body, '').join('\n'));
+}
+renderGuestbook();
+
+function sanitizeSignature(raw) {
+  return raw
+    .replace(/[\u0000-\u001f\u007f]/g, ' ') // sin caracteres de control ni escapes
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function addSignature(entry) {
+  guestbook.push(entry);
+  fs.appendFile(GUESTBOOK_LOG, JSON.stringify(entry) + '\n', () => {});
+  renderGuestbook();
+}
+
+const GB_MSG = {
+  es: {
+    usage: '\x1b[33mUso: firmar tu mensaje aquí   (sin comillas, máx 140 caracteres)\x1b[0m',
+    thanks: '\x1b[32m✍  ¡Gracias! Tu firma quedó en el libro de visitas → cat ~/libro-visitas.txt\x1b[0m',
+    already: '\x1b[33mYa firmaste en esta sesión. ¡Gracias!\x1b[0m',
+    limit: '\x1b[33mLímite de firmas por hoy alcanzado desde tu conexión.\x1b[0m',
+    tooLong: `\x1b[33mTu mensaje supera los ${GB_MAX_LEN} caracteres.\x1b[0m`,
+  },
+  en: {
+    usage: '\x1b[33mUsage: sign your message here   (no quotes needed, max 140 chars)\x1b[0m',
+    thanks: '\x1b[32m✍  Thanks! Your signature is in the guestbook → cat ~/english/guestbook.txt\x1b[0m',
+    already: '\x1b[33mYou already signed in this session. Thanks!\x1b[0m',
+    limit: '\x1b[33mDaily signature limit reached from your connection.\x1b[0m',
+    tooLong: `\x1b[33mYour message is over ${GB_MAX_LEN} characters.\x1b[0m`,
+  },
+  pt: {
+    usage: '\x1b[33mUso: sign sua mensagem aqui   (sem aspas, máx. 140 caracteres)\x1b[0m',
+    thanks: '\x1b[32m✍  Obrigado! Sua assinatura está no livro de visitas → cat ~/english/guestbook.txt\x1b[0m',
+    already: '\x1b[33mVocê já assinou nesta sessão. Obrigado!\x1b[0m',
+    limit: '\x1b[33mLimite diário de assinaturas atingido da sua conexão.\x1b[0m',
+    tooLong: `\x1b[33mSua mensagem passa de ${GB_MAX_LEN} caracteres.\x1b[0m`,
+  },
+};
+
+const signaturesByIpDay = new Map();
+
+function notify(ws, text) {
+  try { ws.send(`\r\n${text}\r\n`); } catch (_) {}
+}
+
 // ---------- Comprobaciones de arranque ----------
 // Asíncronas y con timeout: si el CLI de docker se cuelga (daemon caído o
 // a medio arrancar), no debe bloquear el arranque del servidor.
@@ -50,6 +136,14 @@ exec(`docker ps -aq --filter label=${CONTAINER_LABEL}`, { timeout: 5000 }, (err,
 // ---------- Servidor HTTP ----------
 const app = express();
 app.use(express.static(path.join(__dirname, '..', 'public')));
+
+// Últimas firmas para la web (nunca se exponen las IPs)
+app.get('/api/guestbook', (req, res) => {
+  res.json(
+    guestbook.slice(-20).reverse().map((e) => ({ ts: e.ts, msg: e.msg, lang: e.lang }))
+  );
+});
+
 const server = http.createServer(app);
 
 // ---------- WebSocket -> Docker ----------
@@ -138,15 +232,33 @@ wss.on('connection', (ws, req) => {
     '--cap-drop', 'ALL',
     '--user', 'visitante',
     '-e', `VISITOR_LANG=${lang}`,
+    // Libro de visitas visible dentro del sandbox (solo lectura, ambos idiomas)
+    '-v', `${GUESTBOOK_FILE}:/home/visitante/libro-visitas.txt:ro`,
+    '-v', `${GUESTBOOK_FILE}:/home/visitante/english/guestbook.txt:ro`,
     IMAGE,
   ];
 
-  const term = pty.spawn('docker', dockerArgs, {
-    name: 'xterm-256color',
-    cols: 80,
-    rows: 24,
-    env: { PATH: process.env.PATH, HOME: process.env.HOME },
-  });
+  let term;
+  try {
+    term = pty.spawn('docker', dockerArgs, {
+      name: 'xterm-256color',
+      cols: 80,
+      rows: 24,
+      env: { PATH: process.env.PATH, HOME: process.env.HOME },
+    });
+  } catch (err) {
+    // Si el spawn falla (docker ocupado, límite de procesos...), esta sesión
+    // se descarta con un aviso — nunca debe tumbar el servidor entero.
+    console.error(`[!] No se pudo lanzar el sandbox ${containerName}: ${err.message}`);
+    logEvent('spawn_error', { ip, session: containerName, error: err.message });
+    activeSessions--;
+    const n = (sessionsByIp.get(ip) || 1) - 1;
+    if (n <= 0) sessionsByIp.delete(ip); else sessionsByIp.set(ip, n);
+    activeContainers.delete(containerName);
+    try { ws.send('\r\n\x1b[31mNo se pudo iniciar el sandbox. Intenta de nuevo en un momento.\x1b[0m\r\n'); } catch (_) {}
+    try { ws.close(); } catch (_) {}
+    return;
+  }
 
   let closed = false;
   const cleanup = () => {
@@ -191,6 +303,27 @@ wss.on('connection', (ws, req) => {
     cleanup();
   });
 
+  // ---- Libro de visitas: firmas de esta sesión ----
+  let signedThisSession = false;
+  function handleGuestbook(cmdline) {
+    const m = cmdline.match(/^\s*(firmar|sign)(?:\s+(.*))?$/i);
+    if (!m) return;
+    const M = GB_MSG[lang] || GB_MSG.es;
+    const msg = sanitizeSignature((m[2] || '').replace(/^["']+|["']+$/g, ''));
+    if (!msg) { notify(ws, M.usage); return; }
+    if (msg.length > GB_MAX_LEN) { notify(ws, M.tooLong); return; }
+    if (signedThisSession) { notify(ws, M.already); return; }
+    const key = `${ip}:${new Date().toISOString().slice(0, 10)}`;
+    if ((signaturesByIpDay.get(key) || 0) >= GB_PER_IP_DAY) { notify(ws, M.limit); return; }
+    if (signaturesByIpDay.size > 500) signaturesByIpDay.clear(); // poda simple
+    signaturesByIpDay.set(key, (signaturesByIpDay.get(key) || 0) + 1);
+    signedThisSession = true;
+    addSignature({ ts: new Date().toISOString(), ip, lang, msg });
+    logEvent('signature', { ip, session: containerName, lang, msg });
+    console.log(`[${ip}] Firmó: ${msg}`);
+    notify(ws, M.thanks);
+  }
+
   // ---- Captura de comandos (logger tipo honeypot) ----
   let cmdBuffer = '';
   // Estados del parser: 'normal' | 'esc' (tras \x1b) | 'csi' (\x1b[...) | 'osc' (\x1b]...)
@@ -220,6 +353,7 @@ wss.on('connection', (ws, req) => {
         if (cmdBuffer.length > 0) {
           console.log(`[${ip}] Ejecutó: ${cmdBuffer}`);
           logEvent('command', { ip, session: containerName, cmd: cmdBuffer });
+          handleGuestbook(cmdBuffer);
           cmdBuffer = '';
         }
       } else if (char === '\x7F' || char === '\b') {

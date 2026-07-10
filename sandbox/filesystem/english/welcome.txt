@@ -14,4 +14,7 @@ Useful commands:
 
 Start with:  cat about-me.txt or cd projects
 
+Leave your mark:  sign your message here
+Read the wall:    cat guestbook.txt
+
 ¿Español? → cd ~  (los archivos en español están ahí)
