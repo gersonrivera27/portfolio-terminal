@@ -26,6 +26,7 @@
     --metal-hi: #39424c;
     --text: #d7e6ee;
     --muted: #7b8b96;
+    --muted-light: #a9b7c0; /* descripciones secundarias: mismo tinte, +contraste (~8:1 sobre --panel) */
     --neon: #00e5ff;
     --neon-dim: rgba(0, 229, 255, .35);
     --neon-faint: rgba(0, 229, 255, .12);
@@ -224,7 +225,7 @@
   .cmd-btn:hover .ico { opacity: 1; filter: drop-shadow(0 0 4px var(--neon-dim)); }
   .cmd-btn .c { display: block; color: var(--neon); font-weight: 600; font-size: .8rem; transition: text-shadow .15s; }
   .cmd-btn .c::before { content: '$ '; color: var(--muted); font-weight: 400; }
-  .cmd-btn .d { display: block; color: var(--muted); font-size: .68rem; margin-top: .2rem; }
+  .cmd-btn .d { display: block; color: var(--muted-light); font-size: .68rem; margin-top: .2rem; }
   .note { color: var(--muted); font-size: .74rem; margin-top: .8rem; line-height: 1.6; }
 
   .term-side { display: flex; flex-direction: column; min-width: 0; }
@@ -245,8 +246,19 @@
   }
   .dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; box-shadow: inset 0 -1px 2px rgba(0,0,0,.5); }
   .dot.r { background: #ff5f57; } .dot.y { background: #febc2e; } .dot.g { background: #28c840; }
-  .term-title { color: var(--muted); font-size: .74rem; margin-left: .4rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .term-title {
+    color: var(--term-green); font-size: .74rem; margin-left: .4rem;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    text-shadow: 0 0 5px rgba(69, 243, 118, .5);
+  }
   #terminal { padding: .5rem; height: clamp(300px, 48vh, 430px); }
+  /* Glow CRT: este build usa el DOM renderer de xterm.js (spans reales, no
+     canvas), así que text-shadow actúa directo sobre los glyphs — fósforo
+     verde sutil, sin perder nitidez. Si algún día se activa el addon Canvas
+     o WebGL, cambiar a filter: drop-shadow(...) sobre el <canvas>. */
+  #terminal .xterm-rows {
+    text-shadow: 0 0 5px rgba(69, 243, 118, .5);
+  }
   .status-row { display: flex; align-items: center; flex-wrap: wrap; gap: .8rem; margin-top: .6rem; font-size: .76rem; color: var(--muted); }
   #reconnect {
     display: none; font: inherit; font-size: .76rem; cursor: pointer;
