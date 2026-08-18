@@ -1,0 +1,7 @@
+node_modules/
+server/logs/
+.DS_Store
+.env
+server/data/
+.agents/
+.claude/

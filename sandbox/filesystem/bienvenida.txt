@@ -1,0 +1,17 @@
+╔═════════════════════════════════════════════════════╗
+║   Bienvenido al portafolio de Gerson Hernandez R.   ║
+╚═════════════════════════════════════════════════════╝
+
+Estás en una terminal REAL corriendo en mi entorno de
+laboratorio. Este es un entorno sandbox aislado, así que 
+explora con confianza.
+
+Empieza con:  cat sobre-mi.txt o cd proyectos
+
+Deja tu huella:  firmar tu mensaje aquí
+Lee las firmas:  cat libro-visitas.txt
+
+English? → cd english  (everything is translated there)
+
+Transparencia: esta sesión queda registrada (comandos e IP).
+Este portafolio también alimenta mi laboratorio SOC/honeypot.
