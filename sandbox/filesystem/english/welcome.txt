@@ -9,5 +9,5 @@ free to explore with confidence.
 Leave your mark:  sign your message here
 ¿Español? → cd ~  (los archivos en español están ahí)
 
-Transparency: this session is logged (commands and IP).
+(commands + truncated IP)
 Every session is logged to my Grafana + Loki stack.

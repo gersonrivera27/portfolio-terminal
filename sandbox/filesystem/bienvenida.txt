@@ -9,5 +9,5 @@ explora con confianza.
 Deja tu huella:  firmar { tu mensaje aquí}
 English? → cd english  (everything is translated there)
 
-Transparencia: esta sesión queda registrada (comandos e IP).
+(comandos + IP truncada)
 Cada sesión queda registrada en mi stack de Grafana + Loki.
