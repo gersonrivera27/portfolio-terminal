@@ -3,8 +3,8 @@
 Hi, I'm Gerson Hernandez Rivera, Cyber Security & Software Engineer (Junior).
 
 I'm a systems and networks engineer who fell in love with cybersecurity
-and decided to prove it by building, not just studying. I run a live
-honeypot exposed to the internet, took a full-stack platform to
+and decided to prove it by building, not just studying. I built a honeypot
+exposed to the internet to analyze attacks, took a full-stack platform to
 production, and maintain hands-on labs in network segmentation and forensics.
 
 I learn fastest by getting my hands on real systems, and I use AI in my
