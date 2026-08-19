@@ -24,7 +24,14 @@ const LOG_FILE = path.join(LOG_DIR, 'sessions.jsonl');
 fs.mkdirSync(LOG_DIR, { recursive: true });
 function logEvent(event, fields) {
   const entry = { ts: new Date().toISOString(), event, ...fields };
+  if (entry.ip) entry.ip = anonIp(entry.ip);
   fs.appendFile(LOG_FILE, JSON.stringify(entry) + '\n', () => {});
+}
+
+function anonIp(ip) {
+  if (!ip || ip === 'unknown') return 'unknown';
+  if (ip.includes(':')) return ip.split(':').slice(0, 3).join(':') + '::';
+  return ip.split('.').slice(0, 3).join('.') + '.0';
 }
 
 // ---------- Libro de visitas ----------
@@ -78,8 +85,9 @@ function sanitizeSignature(raw) {
 }
 
 function addSignature(entry) {
-  guestbook.push(entry);
-  fs.appendFile(GUESTBOOK_LOG, JSON.stringify(entry) + '\n', () => {});
+  const stored = { ...entry, ip: anonIp(entry.ip) };
+  guestbook.push(stored);
+  fs.appendFile(GUESTBOOK_LOG, JSON.stringify(stored) + '\n', () => {});
   renderGuestbook();
 }
 
